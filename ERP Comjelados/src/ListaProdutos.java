@@ -5,7 +5,7 @@ public class ListaProdutos {
     public static Map<String, Integer> produtos = new HashMap<>();
 
     static {
-        produtos.put("Empadão de frango 25", 25);
+        produtos.put("Empadão de frango", 25);
         produtos.put("Torta folhada", 25);
         produtos.put("Empadas", 15);
         produtos.put("Pão de queijo tradicional", 25);
