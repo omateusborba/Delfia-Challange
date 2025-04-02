@@ -1,9 +1,9 @@
 import java.util.Scanner;
 
 public class Menu {
+    Scanner scanner = new Scanner(System.in);
     public void exibir(){
         Cadastro cadastro = new Cadastro();
-        Scanner scanner = new Scanner(System.in);
         RegistroVenda venda = new RegistroVenda();
         System.out.println("""
                 
