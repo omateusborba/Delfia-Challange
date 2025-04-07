@@ -1,4 +1,5 @@
 // Como vendedor, quero registrar vendas e recebimentos, para que eu possa manter um histórico das transações e garantir a precisão do faturamento.
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class RegistroVenda {
@@ -8,20 +9,35 @@ public class RegistroVenda {
     Cadastro cadastro = new Cadastro();
 
     public void venderProduto() {
-        // Pegar o nome do produto        
         System.out.print("Digite o nome do produto que foi realizada a venda -> ");
-        String produto = scanner.nextLine();     
-        
-        //Verifica se o produto está na Lista
-        if(produtos.getProdutos().containsKey(produto)){
-            System.out.print(String.format("Quantas unidades de %s foram vendidos?", produto.toString()));
+        String produtoVendido = scanner.nextLine();
 
-            int quantidade = scanner.nextInt();
-            int preco = produtos.getProdutos().get(produto).intValue();
-            int totalVenda = quantidade * preco;
-            System.out.println(String.format("Valor total da venda: R$%d,00", totalVenda));
-        } else{
-            System.out.println(String.format("O produto: %s, não foi encontrado, tente novamente!", produto));
+        if (produtos.getProdutos().containsKey(produtoVendido)) {
+            System.out.print(String.format("Quantas unidades de %s foram vendidas? -> ", produtoVendido));
+            try {
+                int quantidadeVendida = scanner.nextInt();
+                scanner.nextLine(); // Consumir a quebra de linha
+
+                if (quantidadeVendida > 0) {
+                    produtos.calcularSubtotal(produtoVendido, quantidadeVendida);
+                    produtos.atualizarEstoque(produtoVendido, quantidadeVendida);
+                    try {
+                        Thread.sleep(2000); // Pausa por 2 segundos
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    menu.exibir();
+                } else {
+                    System.out.println("A quantidade vendida deve ser maior que zero.");
+                }
+
+            } catch (InputMismatchException e) {
+                System.out.println("Erro: Por favor, digite um número inteiro para a quantidade.");
+                scanner.nextLine(); // Limpar o buffer do scanner
+            }
+
+        } else {
+            System.out.println(String.format("O produto: %s, não foi encontrado, tente novamente!", produtoVendido));
             try {
                 Thread.sleep(2000); // Pausa por 2 segundos
             } catch (InterruptedException e) {
@@ -29,6 +45,5 @@ public class RegistroVenda {
             }
             menu.exibir();
         }
-
     }
 }
