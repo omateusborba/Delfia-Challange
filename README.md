@@ -1,3 +1,1 @@
 ﻿# Flux ERP
-
-<img height="40" width="40" src="./img/flux-logo-sf.png" />
