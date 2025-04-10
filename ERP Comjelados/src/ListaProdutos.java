@@ -2,21 +2,23 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 
 public class ListaProdutos {
     public static Map<String, List<Integer>> produtos = new HashMap<>();
 
     static {
-        produtos.put("Empadão de frango", new ArrayList<>(List.of(25, 0)));
-        produtos.put("Torta folhada", new ArrayList<>(List.of(25, 0)));
-        produtos.put("Empadas", new ArrayList<>(List.of(15, 0)));
-        produtos.put("Pão de queijo tradicional", new ArrayList<>(List.of(25, 0)));
-        produtos.put("Panqueca", new ArrayList<>(List.of(25, 0)));
-        produtos.put("Pão de queijo recheado", new ArrayList<>(List.of(28, 0)));
-        produtos.put("Escondidinho de mandioca", new ArrayList<>(List.of(22, 0)));
+        //Dados de estoque, ficticios(por hora)
+        produtos.put("Empadão de frango", new ArrayList<>(List.of(25, 20)));
+        produtos.put("Torta folhada", new ArrayList<>(List.of(25, 5)));
+        produtos.put("Empadas", new ArrayList<>(List.of(15, 10)));
+        produtos.put("Pão de queijo tradicional", new ArrayList<>(List.of(25, 12)));
+        produtos.put("Panqueca", new ArrayList<>(List.of(25, 35)));
+        produtos.put("Pão de queijo recheado", new ArrayList<>(List.of(28, 22)));
+        produtos.put("Escondidinho de mandioca", new ArrayList<>(List.of(22, 8)));
         produtos.put("Lasanha", new ArrayList<>(List.of(25, 0)));
-        produtos.put("Pastel de Angu", new ArrayList<>(List.of(18, 0)));
-        produtos.put("Bolinho fit de frango", new ArrayList<>(List.of(18, 0)));
+        produtos.put("Pastel de Angu", new ArrayList<>(List.of(18, 15)));
+        produtos.put("Bolinho fit de frango", new ArrayList<>(List.of(18, 6)));
     }
 
     //retorna os produtos
@@ -76,6 +78,31 @@ public class ListaProdutos {
             }
         } else {
             System.out.println("Produto não encontrado: " + produto);
+        }
+    }
+
+    //exibe a lista de produtos atualizada
+    public void exibeLista() {
+        Menu menu = new Menu();
+
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("\nLista de produtos atualizada:");
+        System.out.println("---------------------------------------------------------");
+        int n = 1;
+        for (Map.Entry<String, List<Integer>> entry : produtos.entrySet()) {
+            String produto = entry.getKey();
+            int quantidade = entry.getValue().get(1); // A quantidade está no índice 1
+
+            System.out.println(n + "-" + produto + " - Quantidade no estoque: " + quantidade);
+            System.out.println("---------------------------------------------------------");
+            n++;
+        }
+        System.out.print("Deseja voltar ao menu inicial? S/N -> ");
+        String opc = scanner.nextLine();
+        opc = opc.toUpperCase(); 
+
+        if(opc.equals("S")){
+            menu.exibir();
         }
     }
 }
