@@ -1,6 +1,8 @@
-import logo from "../../components/img/flux-logo.png"
-import { color } from "chart.js/helpers"
-import { Link } from "react-router-dom"
+import mateus from '../img/mateus.jpg';
+import tiago from '../img/tiago.jpg';
+import pedro from '../img/pedro.jpg';
+import rafael from '../img/rafael.jpg';
+import igor from '../img/igor.jpg';
 export default function Home() {
 
     return (
@@ -92,35 +94,35 @@ export default function Home() {
                 <div className="row">
                     <div className="col-lg-4">
                         <div className="testimonial-item mx-auto mb-5 mb-lg-0">
-                            <img className="img-fluid rounded-circle mb-3" src="assets/img/testimonials-1.jpg" alt="..." />
+                            <img className="img-thumbnail rounded-circle mb-3" width={200} style={{ height: '200px', objectFit: 'cover' }}  src={igor} />
                             <h5>Igor Spindola</h5>
                             <p className="font-weight-light mb-0">RM: 557761</p>
                         </div>
                     </div>
                     <div className="col-lg-4">
                         <div className="testimonial-item mx-auto mb-5 mb-lg-0">
-                            <img className="img-fluid rounded-circle mb-3" src="assets/img/testimonials-1.jpg" alt="..." />
+                            <img className="img-thumbnail rounded-circle mb-3" width={200} style={{ height: '200px', objectFit: 'cover' }} src={mateus}  />
                             <h5>Mateus Borba</h5>
                             <p className="font-weight-light mb-0">RM: 556418</p>
                         </div>
                     </div>
                     <div className="col-lg-4">
                         <div className="testimonial-item mx-auto mb-5 mb-lg-0">
-                            <img className="img-fluid rounded-circle mb-3" src="assets/img/testimonials-1.jpg" alt="..." />
+                            <img className="img-thumbnail rounded-circle mb-3" width={200} style={{ height: '200px', objectFit: 'cover' }}  src={pedro} />
                             <h5>Pedro Morais</h5>
                             <p className="font-weight-light mb-0">RM: 557533</p>
                         </div>
                     </div>
                     <div className="col-lg-4">
                         <div className="testimonial-item mx-auto mb-5 mb-lg-0">
-                            <img className="img-fluid rounded-circle mb-3" src="assets/img/testimonials-1.jpg" alt="..." />
+                            <img className="img-thumbnail rounded-circle mb-3" width={200} style={{ height: '200px', objectFit: 'cover' }}  src={rafael} />
                             <h5>Rafael Daloia</h5>
                             <p className="font-weight-light mb-0">RM: 555356</p>
                         </div>
                     </div>
                     <div className="col-lg-4">
                         <div className="testimonial-item mx-auto mb-5 mb-lg-0">
-                            <img className="img-fluid rounded-circle mb-3" src="assets/img/testimonials-1.jpg" alt="..." />
+                            <img className="img-thumbnail rounded-circle mb-3" width={200} style={{ height: '200px', objectFit: 'cover' }}  src={tiago} />
                             <h5>Tiago Decker</h5>
                             <p className="font-weight-light mb-0">RM: 556438</p>
                         </div>
