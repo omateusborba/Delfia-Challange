@@ -4,14 +4,13 @@ import {
     CategoryScale,
     LinearScale,
     BarElement,
-    Title,
     Tooltip,
     Legend
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
 
 // Registre os componentes do Chart.js
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
 export const BarChart = () => {
     const data = {
@@ -36,10 +35,6 @@ export const BarChart = () => {
         plugins: {
             legend: {
                 position: 'top',
-            },
-            title: {
-                display: true,
-                text: 'Gráfico de Vendas',
             },
         },
     };

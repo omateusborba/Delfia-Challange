@@ -11,7 +11,7 @@ export default function Menu() {
     </Link>
   
     <button
-      className="navbar-toggler"
+      className="navbar-toggler m-3"
       type="button"
       data-bs-toggle="offcanvas"
       data-bs-target="#offcanvasNavbar"

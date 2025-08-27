@@ -26,30 +26,30 @@ export default function Home() {
             </div>
         </header>
         <section className="p-5">
-                    <div class="container">
-                    <div class="row text-center">
-                        <div class="col-md-4 mb-4">
-                        <div class="border rounded p-4 h-100">
-                            <div class="mb-3">
-                            <span class="fs-1 text-primary">&#9881;</span>
+                    <div className="container">
+                    <div className="row text-center">
+                        <div className="col-md-4 mb-4">
+                        <div className="shadow border rounded p-4 h-100">
+                            <div className="mb-3">
+                            <span className="fs-1 text-primary">&#9881;</span>
                             </div>
                             <h4>Controle de estoque</h4>
                             <p>Evita desperdícios, perdas e falta de produtos.</p>
                         </div>
                         </div>
-                        <div class="col-md-4 mb-4">
-                        <div class="border rounded p-4 h-100">
-                            <div class="mb-3">
-                            <span class="fs-1 text-success">&#128640;</span>
+                        <div className="col-md-4 mb-4">
+                        <div className="shadow border rounded p-4 h-100">
+                            <div className="mb-3">
+                            <span className="fs-1 text-success">&#128640;</span>
                             </div>
                             <h4>Gestão financeira integrada</h4>
                             <p>Permite acompanhamento detalhado de receitas e despesas.</p>
                         </div>
                         </div>
-                        <div class="col-md-4 mb-4">
-                        <div class="border rounded p-4 h-100">
-                            <div class="mb-3">
-                            <span class="fs-1 text-danger">&#128161;</span>
+                        <div className="col-md-4 mb-4">
+                        <div className="shadow border rounded p-4 h-100">
+                            <div className="mb-3">
+                            <span className="fs-1 text-danger">&#128161;</span>
                             </div>
                             <h4>Organização de pedidos e clientes</h4>
                             <p>Centraliza informações e agiliza o atendimento.</p>
@@ -94,35 +94,35 @@ export default function Home() {
                 <div className="row">
                     <div className="col-lg-4">
                         <div className="testimonial-item mx-auto mb-5 mb-lg-0">
-                            <img className="img-thumbnail rounded-circle mb-3" width={200} style={{ height: '200px', objectFit: 'cover' }}  src={igor} />
+                            <img className="shadow object-fit-cover img-thumbnail rounded-circle mb-3" width={200} style={{ height: '200px' }}  src={igor} />
                             <h5>Igor Spindola</h5>
                             <p className="font-weight-light mb-0">RM: 557761</p>
                         </div>
                     </div>
                     <div className="col-lg-4">
                         <div className="testimonial-item mx-auto mb-5 mb-lg-0">
-                            <img className="img-thumbnail rounded-circle mb-3" width={200} style={{ height: '200px', objectFit: 'cover' }} src={mateus}  />
+                            <img className="shadow object-fit-cover img-thumbnail rounded-circle mb-3" width={200} style={{ height: '200px'}} src={mateus}  />
                             <h5>Mateus Borba</h5>
                             <p className="font-weight-light mb-0">RM: 556418</p>
                         </div>
                     </div>
                     <div className="col-lg-4">
                         <div className="testimonial-item mx-auto mb-5 mb-lg-0">
-                            <img className="img-thumbnail rounded-circle mb-3" width={200} style={{ height: '200px', objectFit: 'cover' }}  src={pedro} />
+                            <img className="shadow object-fit-cover img-thumbnail rounded-circle mb-3" width={200} style={{ height: '200px'}}  src={pedro} />
                             <h5>Pedro Morais</h5>
                             <p className="font-weight-light mb-0">RM: 557533</p>
                         </div>
                     </div>
                     <div className="col-lg-4">
                         <div className="testimonial-item mx-auto mb-5 mb-lg-0">
-                            <img className="img-thumbnail rounded-circle mb-3" width={200} style={{ height: '200px', objectFit: 'cover' }}  src={rafael} />
+                            <img className="shadow object-fit-cover img-thumbnail rounded-circle mb-3" width={200} style={{ height: '200px'}}  src={rafael} />
                             <h5>Rafael Daloia</h5>
                             <p className="font-weight-light mb-0">RM: 555356</p>
                         </div>
                     </div>
                     <div className="col-lg-4">
                         <div className="testimonial-item mx-auto mb-5 mb-lg-0">
-                            <img className="img-thumbnail rounded-circle mb-3" width={200} style={{ height: '200px', objectFit: 'cover' }}  src={tiago} />
+                            <img className="shadow object-fit-cover img-thumbnail rounded-circle mb-3" width={200} style={{ height: '200px'}}  src={tiago} />
                             <h5>Tiago Decker</h5>
                             <p className="font-weight-light mb-0">RM: 556438</p>
                         </div>
@@ -131,9 +131,9 @@ export default function Home() {
             </div>
         </section>
         
-        <footer class="bg-dark text-light py-4 mt-auto">
-            <div class="container text-center">
-            <p class="mb-0">&copy; 2025 Flux ERP.</p>
+        <footer className="bg-dark text-light py-4 mt-auto">
+            <div className="container text-center">
+            <p className="mb-0">&copy; 2025 Flux ERP.</p>
             </div>
         </footer>
         </>
