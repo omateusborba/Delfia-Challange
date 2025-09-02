@@ -17,64 +17,26 @@ public class ClienteDAO {
         this.conexao = Factory.getConnection();
     }
 
-    public void listarClientes() {
-        try {
-            String sql = "SELECT * FROM t_cliente";
-            PreparedStatement stmt = conexao.prepareStatement(sql);
-            ResultSet rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                int id = rs.getInt("id_cliente");
-                String nome = rs.getString("nm_cliente");
-                String telefone = rs.getString("nr_telefone");
-                String instagram = rs.getString("tx_instagram");
-
-                System.out.println("ID: " + id);
-                System.out.println("Nome: " + nome);
-                System.out.println("Telefone: " + telefone);
-                System.out.println("Instagram: " + instagram);
-                System.out.println("---------------------------");
-            }
-
-            rs.close();
-            stmt.close();
-            conexao.close();
-
-        } catch (SQLException e) {
-            System.err.println("Erro ao listar clientes: " + e.getMessage());
-        }
-    }
-
-    public void adicionaCliente(Cliente cliente){
-        if (this.conexao == null){
-            System.err.println("Conexão não estabelecida!");
-            return;
-        }
-
+    public void adicionaCliente(Cliente cliente) {
         String sql = "INSERT INTO t_cliente (nm_cliente, nr_telefone, tx_instagram) VALUES (?, ?, ?)";
-        try(PreparedStatement stmt = conexao.prepareStatement(sql)){
+
+        try (PreparedStatement stmt = conexao.prepareStatement(sql)) {
             stmt.setString(1, cliente.getNome());
             stmt.setString(2, cliente.getTelefone());
             stmt.setString(3, cliente.getInstagram());
 
-            int linhasAfetadas = stmt.executeUpdate();
-            if(linhasAfetadas > 0){
-                System.out.println("Cliente inserido com sucesso!!");
-            }
-
-            stmt.close();
-            conexao.close();
-        } catch (SQLException e){
-            System.err.println("Erro ao adicionar Cliente: " + e);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao adicionar cliente", e);
         }
-
     }
-    public List<Cliente> getTodosClientes(){
+
+    public List<Cliente> getTodosClientes() {
         List<Cliente> lista = new ArrayList<>();
         String sql = "SELECT * FROM t_cliente";
 
         try (PreparedStatement stmt = conexao.prepareStatement(sql);
-        ResultSet rs = stmt.executeQuery()) {
+             ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
                 int id = rs.getInt("id_cliente");
@@ -82,15 +44,14 @@ public class ClienteDAO {
                 String telefone = rs.getString("nr_telefone");
                 String instagram = rs.getString("tx_instagram");
 
-                Cliente cliente = new Cliente (id, nome, telefone, instagram);
+                Cliente cliente = new Cliente(id, nome, telefone, instagram);
                 lista.add(cliente);
             }
 
         } catch (SQLException e) {
-            System.err.println("Erro ao obter produtos: " + e.getMessage());
+            throw new RuntimeException("Erro ao obter clientes", e);
         }
 
         return lista;
     }
 }
-

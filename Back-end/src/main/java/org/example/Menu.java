@@ -52,7 +52,6 @@ public class Menu {
 
         switch (opc) {
             case 1:
-                clienteDAO.listarClientes();
                 exibir();
                 break;
             case 2:
@@ -70,7 +69,6 @@ public class Menu {
                 exibir();
                 break;
             case 3:
-                estoqueDAO.listarProdutos();
                 exibir();
                 break;
             case 4:
