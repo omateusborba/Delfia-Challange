@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import logo from '../img/flux-logo.png';
 import perfil from "../img/user-1.jpg";
+
 export default function Menu() {
   return (
     <>
@@ -54,22 +55,22 @@ export default function Menu() {
           </li>
         </ul>
 
-        <ul className="navbar-nav ms-lg-auto align-items-center">
+        <ul className="navbar-nav ms-lg-auto align-items-center mx-2">
           <li className="nav-item dropdown">
-            <a
-              className="nav-link"
+            <button
+              className="nav-link border-0 bg-transparent"
               id="drop2"
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
               <img
                 src={perfil}
-                alt=""
+                alt="perfil"
                 width="35"
                 height="35"
                 className="rounded-circle"
               />
-            </a>
+            </button>
             <div
               className="dropdown-menu dropdown-menu-end dropdown-menu-animate-up"
               aria-labelledby="drop2"

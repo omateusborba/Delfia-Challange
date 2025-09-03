@@ -1,7 +1,15 @@
 import { BarChart } from '../BarChart';
 import { GraficoPizza } from "../GraficoPizza";
+import Vendas from "../Tables/Vendas";
+import { Toast } from "bootstrap";
 
 export default function Financeiro() {
+    const showToast = (id) => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                const t = new Toast(el);
+                t.show();
+            };
     return (
         <>
             <div className="main">
@@ -14,7 +22,7 @@ export default function Financeiro() {
                                 <div className="card-body">
                                     <h5 className="card-title">R$ 500,00</h5>
                                     <hr />
-                                    <p className="card-text">$ Vendas Mensais</p>
+                                    <div className="card-text">$ Vendas Mensais</div>
                                 </div>
                                 </div>
                             </div>
@@ -24,7 +32,7 @@ export default function Financeiro() {
                                 <div className="card-body">
                                     <h5 className="card-title">200</h5>
                                     <hr />
-                                    <p className="card-text">Qtd. Vendas Mensais</p>
+                                    <div className="card-text">Qtd. Vendas Mensais</div>
                                 </div>
                                 </div>
                             </div>
@@ -34,7 +42,7 @@ export default function Financeiro() {
                                 <div className="card-body">
                                     <h5 className="card-title">30</h5>
                                     <hr />
-                                    <p className="card-text">Novos Clientes</p>
+                                    <div className="card-text">Novos Clientes</div>
                                 </div>
                                 </div>
                             </div>
@@ -44,7 +52,7 @@ export default function Financeiro() {
                                 <div className="card-body">
                                     <h5 className="card-title">3</h5>
                                     <hr />
-                                    <p className="card-text">Vendedores</p>
+                                    <div className="card-text">Vendedores</div>
                                 </div>
                                 </div>
                             </div>
@@ -57,7 +65,7 @@ export default function Financeiro() {
                                 <div className="card-body">
                                     <h5 className="card-title">Vendas / Clientes</h5>
                                     <hr />
-                                    <p className="card-text"><BarChart /></p>
+                                    <div className="card-text"><BarChart /></div>
                                 </div>
                         </div>
                     </div>
@@ -69,67 +77,106 @@ export default function Financeiro() {
                                         <div className="card-body">
                                             <h5 className="card-title">Produtos mais vendidos</h5>
                                             <hr />
-                                            <p className="card-text"><GraficoPizza /></p>
+                                            <div className="card-text"><GraficoPizza /></div>
                                         </div>
                                 </div>
                             </div>
                             <div className="col">
                                 <div className="shadow card text-bg-light">
                                         <div className="card-body">
-                                            <h5 className="card-title">Vendas / Clientes</h5>
+                                            <h5 className="card-title">Melhores Clientes</h5>
                                             <hr />
-                                            <p className="card-text"><GraficoPizza /></p>
+                                            <div className="card-text"><GraficoPizza /></div>
                                         </div>
                                 </div>
                             </div>
                         </div>
                         </div>
                     </div>
-                </div>
-                <div className="container-financeiro">
-                    <div className="cont3">
+                    <div className='row m-3 justify-content-center'>
+                        <div className="col-12 p-0">
+                        <div className="row row-cols-1">
+                        <div className="col">
+                                <div className="shadow card text-bg-light">
+                                        <div className="card-body">
+                                            <div className="d-flex justify-content-between align-items-center mb-3">
+                                                <h5 className="card-title">Vendas</h5>
+                                                <div className="d-flex gap-2">
+                                                    <button className="btn btn-secondary" data-bs-toggle="modal">Exportar</button>
+                                                    <button className="btn btn-success" data-bs-toggle="modal" data-bs-target="#modaladdvendas" id="btnaddvendas">+ Adicionar</button>
+                                                </div>
+                                            </div>
+                                            <hr />
+                                            <div className="card-text"><Vendas /></div>
+                                        </div>
+                                </div>
+                        </div>
+                        </div>
+                        </div>
                     </div>
-                    <div className="cont3">
-                        
+                </div>
+                <div className="modal fade" id="modaladdvendas" tabindex="-1" aria-labelledby="modaladdvendas" aria-hidden="true">
+                        <div className="modal-dialog modal-dialog-centered modal-lg">
+                            <div className="modal-content">
+                                <div className="modal-header">
+                                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div className="modal-body">
+                                    <form>
+                                        <label for="cliente" className="form-label">Nome do Cliente</label>
+                                        <input type="text" className="form-control mb-3" id="cliente" placeholder="Digite o nome do cliente" />
+                                        <label for="data" className="form-label">Data</label>
+                                        <input type="date" className="form-control mb-3" id="data" />
+                                        <table className="table table-bordered align-center">
+                                            <thead className="table-light">
+                                            <tr>
+                                                <th><button type="button" className="btn btn-primary">Adicionar</button></th>
+                                                <th>Produto</th>
+                                                <th>Quantidade</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr>
+                                                <td><button type="button" className="btn btn-danger">Excluir</button></td>
+                                                <td>
+                                                <select class="form-select" aria-label="Nome do produto">
+                                                    <option selected>Nome do produto</option>
+                                                </select>
+                                                </td>
+                                                <td>
+                                                <input type="number" className="form-control mb-3" min="1" value="1" />
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </form>
+                                </div>
+                                <div className="modal-footer">
+                                    <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="button" className="btn btn-success" data-bs-dismiss="modal" onClick={() => showToast("taddvenda")}>Adicionar</button>
+                                </div>
+                            </div>
+                        </div>
+                </div>
+            </div>
+            <div className="toast-container position-fixed bottom-0 end-0 p-3">
+                    <div
+                    id="taddvenda"
+                    className="toast text-bg-success"
+                    role="alert"
+                    aria-live="assertive"
+                    aria-atomic="true"
+                    >
+                    <div className="d-flex">
+                        <div className="toast-body">Venda adicionada com sucesso!</div>
+                        <button
+                        type="button"
+                        className="btn-close me-2 m-auto"
+                        data-bs-dismiss="toast"
+                        aria-label="Close"
+                        ></button>
                     </div>
-                </div>
-                <div className="cont4">
-                    <p>Vendas mensais</p>
-                    <table className="table table-striped mx-auto my-4" style={{ width: '99%' }}>
-                        <thead>
-                            <tr>
-                                <th scope="col">Nome</th>
-                                <th scope="col">Telefone</th>
-                                <th scope="col">Compras</th>
-                                <th scope="col">Produtos</th>
-                                <th scope="col">Preferido</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <th scope="row">Lorem, ipsum.</th>
-                                <td>(99)999999999</td>
-                                <td>9</td>
-                                <td>9</td>
-                                <td>Lorem.</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Lorem, ipsum.</th>
-                                <td>(99)999999999</td>
-                                <td>9</td>
-                                <td>9</td>
-                                <td>Lorem.</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Lorem, ipsum.</th>
-                                <td>(99)999999999</td>
-                                <td>9</td>
-                                <td>9</td>
-                                <td>Lorem.</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                    </div>
             </div>
         </>
     )

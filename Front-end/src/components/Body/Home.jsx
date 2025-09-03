@@ -3,14 +3,18 @@ import tiago from '../img/tiago.jpg';
 import pedro from '../img/pedro.jpg';
 import rafael from '../img/rafael.jpg';
 import igor from '../img/igor.jpg';
+import fundo from '../img/fundo.png';
+import note from '../img/note.png';
+import will from '../img/will.jpg';
+import kelly from '../img/kelly.jpg';
+
 export default function Home() {
 
     return (
         <>
         <header style={{
     position: 'relative',
-    backgroundColor: '#343a40',
-    // backgroundImage: `url(${logo})`,
+    backgroundImage: `url(${fundo})`,
     backgroundRepeat: 'no-repeat',
     backgroundPosition: 'center center',
     backgroundSize: 'cover',
@@ -20,7 +24,7 @@ export default function Home() {
             <div className=" position-relative" >
                 <div className="col-12 justify-content-center">
                         <div className="text-center text-black">
-                            <h1 className="mb-5">Mais que um sistema: inteligência para o crescimento do seu negócio</h1>
+                            <h1 className="mb-5" style={{color: '#ffff'}}>Mais que um sistema: inteligência para o crescimento do seu negócio</h1>
                         </div>
                 </div>
             </div>
@@ -58,11 +62,12 @@ export default function Home() {
                     </div>
                     </div>
         </section>
-        <section className="showcase">
-            <div className="container-fluid py-5">
+        <section className="p-0">
+            <div className="container-fluid py-5 px-0">
                 <div className="row g-0">
-                    <div className="col-lg-6 order-lg-2 text-white showcase-img" backgroundImage="assets/img/bg-showcase-1.jpg" style={{backgroundImage: "url('assets/img/bg-showcase-1.jpg')"}} ></div>
-                    <div className="col-lg-6 order-lg-1 my-auto showcase-text">
+                    <div className="col-lg-6 order-lg-2 text-white " style={{backgroundImage: `url(${note})`, backgroundPosition: 'center center',
+    backgroundSize: 'cover',}} ></div>
+                    <div className="col-lg-6  my-auto p-5">
                         <h2>IA para gestão de Marketing</h2>
                         <p className="lead mb-0">Análise de dados de vendas anteriores e comportamento dos clientes, identificando padrões de consumo e preferências.
                         Recomendações de estratégias de marketing personalizadas, com base em dados de mercado e perfil do público-alvo.
@@ -72,17 +77,27 @@ export default function Home() {
                     </div>
                 </div>
                 <div className="row g-0">
-                    <div className="col-lg-6 text-white showcase-img" style={{backgroundImage: "url('assets/img/bg-showcase-2.jpg')"}} ></div>
-                    <div className="col-lg-6 my-auto showcase-text">
-                        <h2>Updated For Bootstrap 5</h2>
-                        <p className="lead mb-0">Newly improved, and full of great utility classes, Bootstrap 5 is leading the way in mobile responsive web development! All of the themes on Start Bootstrap are now using Bootstrap 5!</p>
+                    <div className="col-lg-6 text-white" style={{backgroundImage: `url(${kelly})`, backgroundPosition: 'center center',
+    backgroundSize: 'cover',}} ></div>
+                    <div className="col-lg-6 my-auto p-5">
+                        <h2>IA para gestão de Marketing</h2>
+                        <p className="lead mb-0">Análise de dados de vendas anteriores e comportamento dos clientes, identificando padrões de consumo e preferências.
+                        Recomendações de estratégias de marketing personalizadas, com base em dados de mercado e perfil do público-alvo.
+                        Projeções e estimativas de vendas futuras, considerando variáveis como sazonalidade, tendências do setor e desempenho histórico.
+                        Apoio à tomada de decisão estratégica, ajudando a definir quais produtos priorizar, canais de venda mais eficazes e ações promocionais com maior potencial de retorno.
+                        </p>
                     </div>
                 </div>
                 <div className="row g-0">
-                    <div className="col-lg-6 order-lg-2 text-white showcase-img" style={{backgroundImage: "url('assets/img/bg-showcase-3.jpg')"}}></div>
-                    <div className="col-lg-6 order-lg-1 my-auto showcase-text">
-                        <h2>Easy to Use & Customize</h2>
-                        <p className="lead mb-0">Landing Page is just HTML and CSS with a splash of SCSS for users who demand some deeper customization options. Out of the box, just add your content and images, and your new landing page will be ready to go!</p>
+                    <div className="col-lg-6 order-lg-2 text-white" style={{backgroundImage: `url(${will})`, backgroundPosition: 'center center',
+    backgroundSize: 'cover',}} ></div>
+                    <div className="col-lg-6  my-auto p-5">
+                        <h2>IA para gestão de Marketing</h2>
+                        <p className="lead mb-0">Análise de dados de vendas anteriores e comportamento dos clientes, identificando padrões de consumo e preferências.
+                        Recomendações de estratégias de marketing personalizadas, com base em dados de mercado e perfil do público-alvo.
+                        Projeções e estimativas de vendas futuras, considerando variáveis como sazonalidade, tendências do setor e desempenho histórico.
+                        Apoio à tomada de decisão estratégica, ajudando a definir quais produtos priorizar, canais de venda mais eficazes e ações promocionais com maior potencial de retorno.
+                        </p>
                     </div>
                 </div>
             </div>

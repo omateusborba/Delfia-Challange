@@ -37,7 +37,7 @@ export default function Header() {
           </div>
           <div className="offcanvas-body d-flex flex-column flex-lg-row justify-content-between">
     
-            <ul className="navbar-nav ms-lg-auto align-items-center">
+            <ul className="navbar-nav ms-lg-auto align-items-center mx-2">
               <li className="nav-item dropdown">
                 <a
                   className="nav-link"

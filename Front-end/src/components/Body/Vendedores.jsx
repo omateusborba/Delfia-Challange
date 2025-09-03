@@ -1,7 +1,7 @@
-import Produtos from "../Tables/Estoque";
+import TVendedores from "../Tables/Vendores";
 import { Toast } from "bootstrap";
 
-export default function Estoque() {
+export default function Vendedores() {
     const showToast = (id) => {
         const el = document.getElementById(id);
         if (!el) return;
@@ -18,14 +18,11 @@ export default function Estoque() {
                                     <div className="shadow card text-bg-light">
                                         <div className="card-body">
                                             <div className="d-flex justify-content-between align-items-center mb-3">
-                                                <h5 className="card-title">Estoque</h5>
-                                                <div className="d-flex gap-2">
-                                                    <button className="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modaladdprodutos" id="exportar">Exportar</button>
-                                                    <button className="btn btn-success" data-bs-toggle="modal" data-bs-target="#modaladdprodutos" id="liveToastBtn">+ Adicionar</button>
-                                                </div>
+                                                <h5 className="card-title">Vendedores</h5>
+                                                <button className="btn btn-success" data-bs-toggle="modal" data-bs-target="#modaladdprodutos" id="liveToastBtn">+ Adicionar</button>
                                             </div>
                                             <hr />
-                                            <div className="card-text"><Produtos /></div>
+                                            <div className="card-text"><TVendedores /></div>
                                         </div>
                                     </div>
                             </div>
@@ -40,12 +37,12 @@ export default function Estoque() {
                             </div>
                             <div class="modal-body">
                                 <form>
-                                    <label for="nome" class="form-label">Produto</label>
+                                    <label for="nome" class="form-label">Nome</label>
                                     <input type="text" class="form-control mb-3" id="nome" required/>
-                                    <label for="qtd" class="form-label">Quantidade</label>
-                                    <input type="number" class="form-control mb-3" id="qtd" required/>
-                                    <label for="preco" class="form-label">Preço</label>
-                                    <input type="number" class="form-control mb-3" id="preco" required/>
+                                    <label for="email" class="form-label">E-mail</label>
+                                    <input type="email" class="form-control mb-3" id="email" required/>
+                                    <label for="senha" class="form-label">Senha</label>
+                                    <input type="password" class="form-control mb-3" id="senha" required/>
                                 </form>
                             </div>
                             <div class="modal-footer">
@@ -65,7 +62,7 @@ export default function Estoque() {
                 aria-atomic="true"
                 >
                 <div className="d-flex">
-                    <div className="toast-body">Produto adicionado com sucesso!</div>
+                    <div className="toast-body">Vendedor(a) adicionado(a) com sucesso!</div>
                     <button
                     type="button"
                     className="btn-close me-2 m-auto"

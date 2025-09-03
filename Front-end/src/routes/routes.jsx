@@ -1,7 +1,7 @@
 import React from 'react';
 import { createBrowserRouter } from 'react-router-dom';
 import App from '../App';
-import Construcao from '../components/New';
+import Vendedores from '../components/Body/Vendedores';
 import Financeiro from '../components/Body/Financeiro';
 import Vendedor from '../components/Body/Vendedor';
 import Login from '../components/Pages/Login';
@@ -12,6 +12,7 @@ import Estoque from '../components/Body/Estoque';
 import Header from '../components/Headers/Header';
 import Home from '../components/Body/Home';
 import Landing from '../components/Headers/Landing';
+import VendasVendedor from '../components/Tables/VendasVendedor';
 
 const router = createBrowserRouter([
   {
@@ -20,6 +21,7 @@ const router = createBrowserRouter([
     children: [
       { path: "/", element: <PHome /> },
       { path: "/vendedor", element: <PVendedor /> },
+      { path: "/vendedores", element: <PVendedores /> },
       { path: "/financeiro", element: <PFinanceiro /> },
       { path: "/estoque", element: <PEstoque /> },
       { path: "/clientes", element: <PClientes /> },
@@ -48,6 +50,16 @@ function PClientes() {
     </>
   );
 }
+
+function PVendedores() {
+  return (
+    <>
+      <Menu />
+      <Vendedores/>
+    </>
+  );
+}
+
 
 function PEstoque() {
   return (
