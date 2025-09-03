@@ -1,12 +1,15 @@
 package org.example.factory;
 
 import java.sql.*;
+
 public class Factory {
-    public static String URL = System.getenv("DB_URL");
-    public static String USER = System.getenv("DB_USER");
-    public static String SENHA = System.getenv("DB_PASSWORD");
-    // Metodo para obter uma conexão com o banco de dados
-    public static Connection getConnection() throws SQLException{
-        return DriverManager.getConnection(URL, USER, SENHA);
+    public static Connection getConnection() throws SQLException {
+        String url = System.getenv("DB_URL");
+        String user = System.getenv("DB_USER");
+        String password = System.getenv("DB_PASSWORD");
+
+        System.out.println("Conectando ao banco com URL: " + url);
+
+        return DriverManager.getConnection(url, user, password);
     }
 }
