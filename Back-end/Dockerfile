@@ -12,7 +12,8 @@ RUN mvn clean package -DskipTests
 FROM eclipse-temurin:17-jdk
 
 WORKDIR /app
-COPY --from=build /app/target/*.jar app.jar
+# Altera para o nome exato do "fat jar" gerado pelo Maven
+COPY --from=build /app/target/JDBC-testes-1.0-SNAPSHOT-jar-with-dependencies.jar app.jar
 
 # Render define a porta em $PORT
 ENV PORT=10000
