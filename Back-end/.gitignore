@@ -38,3 +38,4 @@ build/
 .DS_Store
 
 src/main/java/org/example/APIKey.java
+src/main/java/org/example/GeminiChat.java
