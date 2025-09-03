@@ -5,7 +5,7 @@ FROM maven:3.9.6-eclipse-temurin-17 AS build
 WORKDIR /app
 COPY . .
 
-# Compila o projeto (ajuste se usar Gradle)
+# Compila o projeto, pulando os testes para um build mais rápido
 RUN mvn clean package -DskipTests
 
 # Usa a JDK para rodar
