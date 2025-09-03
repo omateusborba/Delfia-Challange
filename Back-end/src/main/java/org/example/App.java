@@ -20,11 +20,5 @@ public class App {
     public static void main(String[] args) throws SQLException {
         final HttpServer server = startServer();
         System.out.println("Servidor rodando em " + BASE_URI);
-        System.out.println("Pressione ENTER para parar...");
-        try {
-            System.in.read();
-        } catch (Exception ignored) {
-        }
-        server.shutdownNow();
     }
 }
