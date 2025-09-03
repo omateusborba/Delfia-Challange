@@ -99,12 +99,12 @@ public class Menu {
                 exportar.exportarClientes();
                 exibir();
                 break;
-            case 8:
-                System.out.print("Digite a sua pergunta: ");
-                String mensagem = scanner.nextLine();
-                GeminiChat geminiChat = new GeminiChat(mensagem);
-                exibir();
-                break;
+            //case 8:
+            //    System.out.print("Digite a sua pergunta: ");
+            //    String mensagem = scanner.nextLine();
+             //   GeminiChat geminiChat = new GeminiChat(mensagem);
+             //   exibir();
+             //   break;
             default:
                 System.out.println("Opção inválida!");
                 break;
