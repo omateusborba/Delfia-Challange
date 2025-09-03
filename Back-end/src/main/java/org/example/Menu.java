@@ -3,11 +3,9 @@ package org.example;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Scanner;
-import org.example.Exportar;
 
 import org.example.dao.*;
 import org.example.model.*;
-import org.example.GeminiChat;
 
 public class Menu {
     public void exibir() throws SQLException, IOException {
