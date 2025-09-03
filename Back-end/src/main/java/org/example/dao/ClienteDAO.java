@@ -54,4 +54,35 @@ public class ClienteDAO {
 
         return lista;
     }
+
+    public boolean atualizaCliente(Cliente cliente){
+        String sql = "UPDATE t_cliente SET nm_cliente = ?, nr_telefone = ?, tx_instagram = ? WHERE id_cliente = ?";
+
+        try (PreparedStatement stmt = conexao.prepareStatement(sql)) {
+            stmt.setString(1, cliente.getNome());
+            stmt.setString(2, cliente.getTelefone());
+            stmt.setString(3, cliente.getInstagram());
+            stmt.setInt(4, cliente.getId_cliente());
+
+            int linhasAfetadas = stmt.executeUpdate();
+            return linhasAfetadas > 0;
+        } catch (SQLException e){
+            System.err.println("Erro ao atualizar cliente: " + e.getMessage());
+            return false;
+        }
+    }
+
+    public boolean deletarCliente(int idCliente) {
+        String sql = "DELETE FROM t_clientes WHERE id_cliente = ?";
+
+        try (PreparedStatement stmt = conexao.prepareStatement(sql)) {
+            stmt.setInt(1, idCliente);
+
+            int linhasAfetadas = stmt.executeUpdate();
+            return linhasAfetadas > 0;
+        } catch (SQLException e){
+            System.err.println("Erro ao deletar cliente: " + e.getMessage());
+            return false;
+        }
+    }
 }

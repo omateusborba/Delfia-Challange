@@ -1,5 +1,6 @@
 package org.example.resource;
 
+import jakarta.ws.rs.core.Response;
 import org.example.dao.EstoqueDAO;
 import org.example.model.Estoque;
 
@@ -26,5 +27,20 @@ public class EstoqueResource {
     }
 
     //fazer o update
-    //fazer o delete
+    @PUT
+    @Path("/{id}")
+    public Response atualizaEstoque(@PathParam("id") int id, Estoque produto) throws SQLException{
+        EstoqueDAO dao = new EstoqueDAO();
+        produto.setId_produto(id);
+        dao.atualizarProduto(produto);
+        return Response.ok(produto).build();
+    }
+
+    @DELETE
+    @Path("/{id}")
+    public Response deletarProduto(@PathParam("id") int id) throws SQLException{
+        EstoqueDAO dao = new EstoqueDAO();
+        dao.deletarProduto(id);
+        return Response.noContent().build();
+    }
 }

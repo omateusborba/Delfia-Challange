@@ -6,6 +6,10 @@ public class Cliente {
     private String telefone;
     private String instagram;
 
+    public Cliente(){
+
+    }
+
     // Construtor completo (usado ao listar do banco)
     public Cliente(Integer id_cliente, String nome, String telefone, String instagram) {
         this.id_cliente = id_cliente;

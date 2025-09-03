@@ -6,6 +6,10 @@ public class Estoque {
     private Integer quantidade;
     private float preco;
 
+    public Estoque(){
+
+    }
+
     public Estoque(Integer id_produto, String nome, Integer quantidade, float preco) {
         this.id_produto = id_produto;
         this.nome = nome;

@@ -1,5 +1,6 @@
 package org.example.resource;
 
+import jakarta.ws.rs.core.Response;
 import org.example.dao.ClienteDAO;
 import org.example.model.Cliente;
 
@@ -26,6 +27,20 @@ public class ClienteResource {
         dao.adicionaCliente(cliente);
     }
 
-    //fazer o update
-    //fazer o delete
+    @PUT
+    @Path("/{id}")
+    public Response atualizarCliente(@PathParam("id") int id, Cliente cliente) throws SQLException{
+        ClienteDAO dao = new ClienteDAO();
+        cliente.setId_cliente(id);
+        dao.atualizaCliente(cliente);
+        return Response.ok(cliente).build();
+    }
+
+    @DELETE
+    @Path("/{id}")
+    public Response deletarCliente(@PathParam("id") int id) throws SQLException{
+        ClienteDAO dao = new ClienteDAO();
+        dao.deletarCliente(id);
+        return Response.noContent().build();
+    }
 }
