@@ -2,37 +2,23 @@ package org.example;
 
 import java.io.IOException;
 import java.sql.*;
-import java.net.URI;
 
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 
-public class App {
+import java.net.URI;
 
-    public static HttpServer startServer(String baseUri) {
+public class App {
+    public static final String BASE_URI = "http://localhost:8081/";
+
+    public static HttpServer startServer() {
         final ResourceConfig rc = new ResourceConfig().packages("org.example");
-        return GrizzlyHttpServerFactory.createHttpServer(URI.create(baseUri), rc);
+        return GrizzlyHttpServerFactory.createHttpServer(URI.create(BASE_URI), rc);
     }
 
-    public static void main(String[] args) throws IOException {
-        String port = System.getenv("PORT");
-        if (port == null) {
-            port = "8080"; // fallback local
-        }
-        String baseUri = "http://0.0.0.0:" + port + "/";
-
-        final HttpServer server = startServer(baseUri);
-        System.out.println("Servidor rodando em " + baseUri);
-
-        // Mantenha o servidor vivo
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            server.shutdownNow();
-        }));
-        try {
-            Thread.currentThread().join();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+    public static void main(String[] args) throws SQLException {
+        final HttpServer server = startServer();
+        System.out.println("Servidor rodando em " + BASE_URI);
     }
 }
