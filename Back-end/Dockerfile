@@ -1,21 +1,13 @@
-# Usa a imagem oficial do Maven para compilar
-FROM maven:3.9.6-eclipse-temurin-17 AS build
-
-# Cria a pasta e copia o código
+# Estágio de build: usa uma imagem base com o OpenJDK e Maven
+FROM maven:3.8.7-openjdk-17 AS builder
 WORKDIR /app
 COPY . .
-
-# Compila o projeto (ajuste se usar Gradle)
 RUN mvn clean package -DskipTests
 
-# Usa a JDK para rodar
-FROM eclipse-temurin:17-jdk
-
+# Estágio final: usa uma imagem menor para a aplicação
+FROM openjdk:17-jdk-slim
 WORKDIR /app
-COPY --from=build /app/target/*.jar app.jar
+COPY --from=builder /app/target/*.jar app.jar
 
-# Render define a porta em $PORT
-ENV PORT=10000
-EXPOSE 10000
-
-CMD ["java", "-jar", "app.jar"]
+# Executa a aplicação Spring Boot
+ENTRYPOINT ["java", "-jar", "app.jar"]
