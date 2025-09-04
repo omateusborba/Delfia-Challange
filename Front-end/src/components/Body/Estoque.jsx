@@ -1,17 +1,57 @@
+import { useState } from "react";
 import Produtos from "../Tables/Estoque";
 import { Toast } from "bootstrap";
+import axios from "axios";
 
 export default function Estoque() {
+    const [produtos, setProdutos] = useState([]); // mantém a lista local
+    const [nome, setNome] = useState("");
+    const [quantidade, setQuantidade] = useState("");
+    const [preco, setPreco] = useState("");
+
     const showToast = (id) => {
         const el = document.getElementById(id);
         if (!el) return;
         const t = new Toast(el);
         t.show();
     };
+
+    const AdicionarProduto = async () => {
+    // valida campos
+    if (!nome || !quantidade || !preco) {
+        alert("Preencha todos os campos!");
+        return;
+    }
+
+    const novoProduto = {
+        nome,
+        quantidade: Number(quantidade),
+        preco: Number(preco),
+    };
+
+    try {
+        await axios.post("http://localhost:8081/estoque", novoProduto);
+
+        // opcional: mostra o toast
+        showToast("add");
+
+        // limpa inputs
+        setNome("");
+        setQuantidade("");
+        setPreco("");
+
+        // **reload da página**
+        window.location.reload();
+
+    } catch (err) {
+        console.error("Erro ao adicionar produto: ", err);
+    }
+};
+
     return (
         <>
             <div className="main">
-                <div className='row m-3 justify-content-center'>
+                <div className="row m-3 justify-content-center">
                     <div className="col-12 p-0">
                         <div className="row row-cols-1">
                             <div className="col">
@@ -20,42 +60,112 @@ export default function Estoque() {
                                         <div className="d-flex justify-content-between align-items-center mb-3">
                                             <h5 className="card-title">Estoque</h5>
                                             <div className="d-flex gap-2">
-                                                <button className="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modaladdprodutos" id="exportar">Exportar</button>
-                                                <button className="btn btn-success" data-bs-toggle="modal" data-bs-target="#modaladdprodutos" id="liveToastBtn">+ Adicionar</button>
+                                                <button
+                                                    className="btn btn-secondary"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target=""
+                                                >
+                                                    Exportar
+                                                </button>
+                                                <button
+                                                    className="btn btn-success"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#modaladdprodutos"
+                                                >
+                                                    + Adicionar
+                                                </button>
                                             </div>
                                         </div>
                                         <hr />
-                                        <div className="card-text"><Produtos /></div>
+                                        <div className="card-text">
+                                            <Produtos produtos={produtos} setProdutos={setProdutos} />
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="modal fade" id="modaladdprodutos" tabindex="-1" aria-labelledby="modaladdprodutos" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered ">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+                {/* Modal adicionar */}
+                <div
+                    className="modal fade"
+                    id="modaladdprodutos"
+                    tabIndex="-1"
+                    aria-labelledby="modaladdprodutos"
+                    aria-hidden="true"
+                >
+                    <div className="modal-dialog modal-dialog-centered">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <button
+                                    type="button"
+                                    className="btn-close"
+                                    data-bs-dismiss="modal"
+                                    aria-label="Close"
+                                ></button>
                             </div>
-                            <div class="modal-body">
+                            <div className="modal-body">
                                 <form>
-                                    <label for="nome" class="form-label">Produto</label>
-                                    <input type="text" class="form-control mb-3" id="nome" required />
-                                    <label for="qtd" class="form-label">Quantidade</label>
-                                    <input type="number" class="form-control mb-3" id="qtd" required />
-                                    <label for="preco" class="form-label">Preço</label>
-                                    <input type="number" class="form-control mb-3" id="preco" required />
+                                    <label htmlFor="nome" className="form-label">
+                                        Produto
+                                    </label>
+                                    <input
+                                        type="text"
+                                        className="form-control mb-3"
+                                        id="nome"
+                                        required
+                                        value={nome}
+                                        onChange={(e) => setNome(e.target.value)}
+                                    />
+                                    <label htmlFor="qtd" className="form-label">
+                                        Quantidade
+                                    </label>
+                                    <input
+                                        type="number"
+                                        className="form-control mb-3"
+                                        id="qtd"
+                                        required
+                                        value={quantidade}
+                                        onChange={(e) => setQuantidade(e.target.value)}
+                                    />
+                                    <label htmlFor="preco" className="form-label">
+                                        Preço
+                                    </label>
+                                    <input
+                                        type="number"
+                                        className="form-control mb-3"
+                                        id="preco"
+                                        required
+                                        step="0.01"
+                                        value={preco}
+                                        onChange={(e) => setPreco(e.target.value)}
+                                    />
                                 </form>
                             </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                <button type="button" class="btn btn-success" data-bs-dismiss="modal" onClick={() => showToast("add")}>Adicionar</button>
+                            <div className="modal-footer">
+                                <button
+                                    type="button"
+                                    className="btn btn-secondary"
+                                    data-bs-dismiss="modal"
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    type="button"
+                                    className="btn btn-success"
+                                    data-bs-dismiss="modal"
+                                    onClick={AdicionarProduto}
+                                >
+                                    Adicionar
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+
+            {/* TOAST */}
             <div className="toast-container position-fixed bottom-0 end-0 p-3">
                 <div
                     id="add"
@@ -76,5 +186,5 @@ export default function Estoque() {
                 </div>
             </div>
         </>
-    )
+    );
 }

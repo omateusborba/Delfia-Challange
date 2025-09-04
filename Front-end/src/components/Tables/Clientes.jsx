@@ -1,14 +1,22 @@
-// Estoque.jsx
-import React from "react";
-import DataTable from "datatables.net-react";
-import DT from "datatables.net-dt";
-import RowReorder from "datatables.net-rowreorder";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import { Toast } from "bootstrap";
 
-DataTable.use(DT);
-DataTable.use(RowReorder);
+export default function Estoque() {
+  const [clientes, setClientes] = useState([]);
+  const [clienteSelecionado, setClienteSelecionado] = useState(null);
+  const [nome, setNome] = useState("");
+  const [instagram, setInstagram] = useState("");
+  const [telefone, setTelefone] = useState("");
 
-export default function Clientes() {
+  useEffect(() => {
+    // Buscar clientes do backend
+    axios
+      .get("http://localhost:8081/clientes")
+      .then((res) => setClientes(res.data))
+      .catch((err) => console.error("Erro ao buscar clientes:", err));
+  }, []);
+
   const showToast = (id) => {
     const el = document.getElementById(id);
     if (!el) return;
@@ -16,213 +24,148 @@ export default function Clientes() {
     t.show();
   };
 
+  // Adicionar cliente
+  const AdicionarCliente = async () => {
+    if (!nome || !instagram || !telefone) {
+      alert("Preencha todos os campos!");
+      return;
+    }
+
+    const novoCliente = {
+      nome,
+      telefone: String(telefone),
+      instagram: String(instagram),
+    };
+
+    try {
+      const res = await axios.post("http://localhost:8081/clientes", novoCliente);
+      setClientes((prev) => [...prev, res.data]);
+      setNome("");
+      setTelefone("");
+      setInstagram("");
+      showToast("add");
+    } catch (err) {
+      console.error("Erro ao adicionar cliente:", err);
+    }
+  };
+
+  // Editar cliente
+  const EditarClientes = async () => {
+    if (!clienteSelecionado) return;
+
+    const dadosAtualizados = {
+      nome,
+      telefone: String(telefone),
+      instagram: String(instagram),
+    };
+
+    try {
+      await axios.put(
+        `http://localhost:8081/clientes/${clienteSelecionado.id_cliente}`,
+        dadosAtualizados
+      );
+      setClientes((prev) =>
+        prev.map((p) =>
+          p.id_cliente === clienteSelecionado.id_cliente
+            ? { ...p, ...dadosAtualizados }
+            : p
+        )
+      );
+      showToast("edit");
+    } catch (err) {
+      console.error("Erro ao editar:", err);
+    }
+  };
+
+  // Excluir cliente
+  const ExcluirCliente = async (id) => {
+    if (!id) return;
+    try {
+      await axios.delete(`http://localhost:8081/clientes/${id}`);
+      setClientes((prev) => prev.filter((p) => p.id_cliente !== id));
+      showToast("liveToast");
+    } catch (err) {
+      console.error("Erro ao deletar:", err);
+    }
+  };
+
   return (
     <>
-
       <div className="table-responsive">
-        <DataTable
-          id="Clientes"
-          className="table table-striped table-bordered"
-          options={{
-          rowReorder: true,
-          responsive: true,
-          language: {
-            lengthMenu: "Mostrar _MENU_ registros por página",
-            zeroRecords: "Nenhum registro encontrado",
-            info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
-            infoEmpty: "Mostrando 0 a 0 de 0 registros",
-            infoFiltered: "(filtrado de _MAX_ registros no total)",
-            search: "Pesquisar:",
-          },
-        }}
-        >
-          <thead>
-            <tr>
-              <th>Nome do Cliente</th>
-              <th>Instagram</th>
-              <th>Telefone</th>
-              <th>Opções</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th>Pedro</th>
-              <td>@teste</td>
-              <td>(00) 4002-8922</td>
-              <td className="p-2">
-                <div className="d-flex justify-content-center align-items-center gap-2 w-100">
-                  <button
-                    type="button"
-                    className="btn btn-primary flex-fill py-2"
-                    data-bs-toggle="modal"
-                    data-bs-target="#modaledit"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      fill="currentColor"
-                      className="bi bi-pencil-square"
-                    >
-                      <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"></path>
-                      <path
-                        fillRule="evenodd"
-                        d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"
-                      ></path>
-                    </svg>
-                  </button>
-
-                  <button
-                    type="button"
-                    className="btn btn-danger flex-fill py-2"
-                    data-bs-toggle="modal"
-                    data-bs-target="#modalremove"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      fill="currentColor"
-                      className="bi bi-trash-fill"
-                    >
-                      <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"></path>
-                    </svg>
-                  </button>
-                </div>
-              </td>
-            </tr>
-
-            {/* repita linhas conforme precisar */}
-            <tr>
-              <th>Tiago</th>
-              <td>@teste</td>
-              <td></td>
-              <td className="p-2">
-                <div className="d-flex justify-content-center align-items-center gap-2 w-100">
-                  <button
-                    type="button"
-                    className="btn btn-primary flex-fill py-2"
-                    data-bs-toggle="modal"
-                    data-bs-target="#modaledit"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      fill="currentColor"
-                      className="bi bi-pencil-square"
-                    >
-                      <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"></path>
-                      <path
-                        fillRule="evenodd"
-                        d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"
-                      ></path>
-                    </svg>
-                  </button>
-
-                  <button
-                    type="button"
-                    className="btn btn-danger flex-fill py-2"
-                    data-bs-toggle="modal"
-                    data-bs-target="#modalremove"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      fill="currentColor"
-                      className="bi bi-trash-fill"
-                    >
-                      <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"></path>
-                    </svg>
-                  </button>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <th>Mateus</th>
-              <td></td>
-              <td>(00) 4002-8922</td>
-              <td className="p-2">
-                <div className="d-flex justify-content-center align-items-center gap-2 w-100">
-                  <button
-                    type="button"
-                    className="btn btn-primary flex-fill py-2"
-                    data-bs-toggle="modal"
-                    data-bs-target="#modaledit"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      fill="currentColor"
-                      className="bi bi-pencil-square"
-                    >
-                      <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"></path>
-                      <path
-                        fillRule="evenodd"
-                        d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"
-                      ></path>
-                    </svg>
-                  </button>
-
-                  <button
-                    type="button"
-                    className="btn btn-danger flex-fill py-2"
-                    data-bs-toggle="modal"
-                    data-bs-target="#modalremove"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      fill="currentColor"
-                      className="bi bi-trash-fill"
-                    >
-                      <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"></path>
-                    </svg>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </DataTable>
+        {clientes.length === 0 ? (
+          <h5 style={{ textAlign: "center" }}>
+            Ops... Ainda não temos clientes por aqui. Clique em ‘Adicionar’ para começar!
+          </h5>
+        ) : (
+          <table className="table table-striped table-bordered">
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Telefone</th>
+                <th>Instagram</th>
+                <th>Opções</th>
+              </tr>
+            </thead>
+            <tbody>
+              {clientes.map((cliente) => (
+                <tr key={cliente.id_cliente}>
+                  <td>{cliente.nome}</td>
+                  <td>{cliente.telefone}</td>
+                  <td>{cliente.instagram}</td>
+                  <td>
+                    <div className="d-flex gap-2">
+                      <button
+                        type="button"
+                        className="btn btn-primary flex-fill py-2"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modaledit"
+                        onClick={() => {
+                          setClienteSelecionado(cliente);
+                          setNome(cliente.nome);
+                          setTelefone(cliente.telefone);
+                          setInstagram(cliente.instagram);
+                        }}
+                      >
+                        <i className="bi bi-pencil-square"></i>
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-danger flex-fill py-2"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modalremove"
+                        onClick={() => setClienteSelecionado(cliente)}
+                      >
+                        <i className="bi bi-trash-fill"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
 
       {/* Modal remover */}
-      <div
-        className="modal fade"
-        id="modalremove"
-        tabIndex={-1}
-        aria-labelledby="modalremoveLabel"
-        aria-hidden="true"
-      >
-        <div className="modal-dialog modal-dialog-centered ">
+      <div className="modal fade" id="modalremove" tabIndex="-1" aria-hidden="true">
+        <div className="modal-dialog modal-dialog-centered">
           <div className="modal-content">
             <div className="modal-header">
-              <button
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
+              <h5 className="modal-title">Remover cliente</h5>
+              <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div className="modal-body">Tem certeza que deseja excluir o cliente?</div>
             <div className="modal-footer">
-              <button
-                type="button"
-                className="btn btn-secondary"
-                data-bs-dismiss="modal"
-              >
+              <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">
                 Cancelar
               </button>
-
-              {/* aqui chama o toast "removecliente" */}
               <button
                 type="button"
                 className="btn btn-danger"
                 data-bs-dismiss="modal"
-                onClick={() => showToast("removecliente")}
+                onClick={() =>
+                  clienteSelecionado && ExcluirCliente(clienteSelecionado.id_cliente)
+                }
               >
                 Remover
               </button>
@@ -232,91 +175,69 @@ export default function Clientes() {
       </div>
 
       {/* Modal editar */}
-      <div
-        className="modal fade"
-        id="modaledit"
-        tabIndex={-1}
-        aria-labelledby="modaleditLabel"
-        aria-hidden="true"
-      >
-        <div className="modal-dialog modal-dialog-centered ">
+      <div className="modal fade" id="modaledit" tabIndex="-1" aria-hidden="true">
+        <div className="modal-dialog modal-dialog-centered">
           <div className="modal-content">
             <div className="modal-header">
-              <button
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
+              <h5 className="modal-title">Editar Cliente</h5>
+              <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div className="modal-body">
               <form>
-                <label for="nome" class="form-label">Nome do Cliente</label>
-                <input type="text" class="form-control mb-3" id="nome" />
-                <label for="insta" class="form-label">Instagram</label>
-                <input type="text" class="form-control mb-3" id="insta"/>
-                <label for="tel" class="form-label">Telefone</label>
-                <input type="tel" class="form-control mb-3" id="tel" />
+                <label className="form-label">Nome</label>
+                <input
+                  className="form-control mb-3"
+                  value={nome}
+                  onChange={(e) => setNome(e.target.value)}
+                />
+                <label className="form-label">Telefone</label>
+                <input
+                  className="form-control mb-3"
+                  value={telefone}
+                  onChange={(e) => setTelefone(e.target.value)}
+                />
+                <label className="form-label">Instagram</label>
+                <input
+                  className="form-control mb-3"
+                  value={instagram}
+                  onChange={(e) => setInstagram(e.target.value)}
+                />
               </form>
             </div>
             <div className="modal-footer">
-              <button
-                type="button"
-                className="btn btn-secondary"
-                data-bs-dismiss="modal"
-              >
+              <button className="btn btn-secondary" data-bs-dismiss="modal">
                 Cancelar
               </button>
-
-              {/* aqui chama o toast "editcliente" */}
               <button
-                type="button"
                 className="btn btn-primary"
                 data-bs-dismiss="modal"
-                onClick={() => showToast("editcliente")}
+                onClick={EditarClientes}
               >
-                Editar
+                Salvar
               </button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* TOASTS (containers) */}
+      {/* Toasts */}
       <div className="toast-container position-fixed bottom-0 end-0 p-3">
-        <div
-          id="removecliente"
-          className="toast text-bg-danger"
-          role="alert"
-          aria-live="assertive"
-          aria-atomic="true"
-        >
+        <div id="liveToast" className="toast text-bg-danger">
           <div className="d-flex">
             <div className="toast-body">Cliente removido com sucesso!</div>
-            <button
-              type="button"
-              className="btn-close me-2 m-auto"
-              data-bs-dismiss="toast"
-              aria-label="Close"
-            ></button>
+            <button type="button" className="btn-close m-auto" data-bs-dismiss="toast"></button>
           </div>
         </div>
-
-        <div
-          id="editcliente"
-          className="toast text-bg-primary mt-2"
-          role="alert"
-          aria-live="assertive"
-          aria-atomic="true"
-        >
+        <div id="edit" className="toast text-bg-primary mt-2">
           <div className="d-flex">
             <div className="toast-body">Cliente editado com sucesso!</div>
-            <button
-              type="button"
-              className="btn-close me-2 m-auto"
-              data-bs-dismiss="toast"
-              aria-label="Close"
-            ></button>
+            <button type="button" className="btn-close m-auto" data-bs-dismiss="toast"></button>
+          </div>
+        </div>
+        <div id="add" className="toast text-bg-success mt-2">
+          <div className="d-flex">
+            <div className="toast-body">Cliente adicionado com sucesso!</div>
+            <button type="button" className="btn-close m-auto" data-bs-dismiss="toast"></button>
           </div>
         </div>
       </div>
