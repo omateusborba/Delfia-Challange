@@ -73,7 +73,7 @@ public class ClienteDAO {
     }
 
     public boolean deletarCliente(int idCliente) {
-        String sql = "DELETE FROM t_clientes WHERE id_cliente = ?";
+        String sql = "DELETE FROM t_cliente WHERE id_cliente = ?";
 
         try (PreparedStatement stmt = conexao.prepareStatement(sql)) {
             stmt.setInt(1, idCliente);
