@@ -1,12 +1,31 @@
+import { useEffect, useRef, useState } from "react";
 import DataTable from "datatables.net-react";
 import DT from "datatables.net-dt";
 import RowReorder from "datatables.net-rowreorder";
 import { Toast } from "bootstrap";
+import axios from "axios";
 
 DataTable.use(DT);
 DataTable.use(RowReorder);
 
+function ExcluirProduto(id) {
+  axios.delete(`http://localhost:8081/${id}`).then(() => window.location.reload()).catch(err => console.error('Erro ao deletar: ', err))
+}
 export default function Estoque() {
+  const [produtos, setProdutos] = useState([]);
+  const tableRef = useRef();
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:8081/estoque")
+      .then((response) => {
+        setProdutos(response.data);
+      })
+      .catch((error) => {
+        console.error("Erro ao buscar produtos: ", error);
+      });
+  }, []);
+
   const showToast = (id) => {
     const el = document.getElementById(id);
     if (!el) return;
@@ -16,175 +35,75 @@ export default function Estoque() {
 
   return (
     <>
-
       <div className="table-responsive">
-        <DataTable
-          id="Estoque"
-          className="table table-striped table-bordered"
-          options={{
-          rowReorder: true,
-          responsive: true,
-          language: {
-            lengthMenu: "Mostrar _MENU_ registros por página",
-            zeroRecords: "Nenhum registro encontrado",
-            info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
-            infoEmpty: "Mostrando 0 a 0 de 0 registros",
-            infoFiltered: "(filtrado de _MAX_ registros no total)",
-            search: "Pesquisar:",
-          },
-        }}
-        >
-          <thead>
-            <tr>
-              <th>Produto</th>
-              <th>Quantidade</th>
-              <th>Preço</th>
-              <th>Opções</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th>Pacote Coxinha</th>
-              <td>15</td>
-              <td>R$ 20,00</td>
-              <td className="p-2">
-                <div className="d-flex justify-content-center align-items-center gap-2 w-100">
-                  <button
-                    type="button"
-                    className="btn btn-primary flex-fill py-2"
-                    data-bs-toggle="modal"
-                    data-bs-target="#modaledit"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      fill="currentColor"
-                      className="bi bi-pencil-square"
-                    >
-                      <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"></path>
-                      <path
-                        fillRule="evenodd"
-                        d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"
-                      ></path>
-                    </svg>
-                  </button>
+        {produtos.length === 0 ? (
+          <h5 style={{ textAlign: "center" }}>
+            Ops... Ainda não temos produtos por aqui. Clique em ‘Adicionar’ para
+            começar!
+          </h5>
+        ) : (
+          <DataTable
+            ref={tableRef}
+            id="Estoque"
+            className="table table-striped table-bordered"
+            options={{
+              rowReorder: true,
+              responsive: true,
+              language: {
+                lengthMenu: "Mostrar _MENU_ registros por página",
+                zeroRecords: "Nenhum registro encontrado",
+                info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                infoEmpty: "Mostrando 0 a 0 de 0 registros",
+                infoFiltered: "(filtrado de _MAX_ registros no total)",
+                search: "Pesquisar:",
+              },
+            }}
+          >
+            <thead>
+              <tr>
+                <th>Produto</th>
+                <th>Quantidade</th>
+                <th>Preço</th>
+                <th>Opções</th>
+              </tr>
+            </thead>
+            <tbody>
+              {produtos.map((produto) => (
+                <tr key={produto.id_produto}>
+                  <td>{produto.nome}</td>
+                  <td>{produto.quantidade}</td>
+                  <td>
+                    R${" "}
+                    {produto.preco
+                      .toFixed(2)
+                      .replace(".", ",")}
+                  </td>
+                  <td className="p-2">
+                    <div className="d-flex justify-content-center align-items-center gap-2 w-100">
+                      <button
+                        type="button"
+                        className="btn btn-primary flex-fill py-2"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modaledit"
+                      >
+                        <i className="bi bi-pencil-square"></i>
+                      </button>
 
-                  <button
-                    type="button"
-                    className="btn btn-danger flex-fill py-2"
-                    data-bs-toggle="modal"
-                    data-bs-target="#modalremove"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      fill="currentColor"
-                      className="bi bi-trash-fill"
-                    >
-                      <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"></path>
-                    </svg>
-                  </button>
-                </div>
-              </td>
-            </tr>
-
-            {/* repita linhas conforme precisar */}
-            <tr>
-              <th>Bandeja Empada</th>
-              <td>50</td>
-              <td>R$ 12,00</td>
-              <td className="p-2">
-                <div className="d-flex justify-content-center align-items-center gap-2 w-100">
-                  <button
-                    type="button"
-                    className="btn btn-primary flex-fill py-2"
-                    data-bs-toggle="modal"
-                    data-bs-target="#modaledit"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      fill="currentColor"
-                      className="bi bi-pencil-square"
-                    >
-                      <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"></path>
-                      <path
-                        fillRule="evenodd"
-                        d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"
-                      ></path>
-                    </svg>
-                  </button>
-
-                  <button
-                    type="button"
-                    className="btn btn-danger flex-fill py-2"
-                    data-bs-toggle="modal"
-                    data-bs-target="#modalremove"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      fill="currentColor"
-                      className="bi bi-trash-fill"
-                    >
-                      <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"></path>
-                    </svg>
-                  </button>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <th>Lasanha</th>
-              <td>25</td>
-              <td>R$ 25,00</td>
-              <td className="p-2">
-                <div className="d-flex justify-content-center align-items-center gap-2 w-100">
-                  <button
-                    type="button"
-                    className="btn btn-primary flex-fill py-2"
-                    data-bs-toggle="modal"
-                    data-bs-target="#modaledit"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      fill="currentColor"
-                      className="bi bi-pencil-square"
-                    >
-                      <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"></path>
-                      <path
-                        fillRule="evenodd"
-                        d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"
-                      ></path>
-                    </svg>
-                  </button>
-
-                  <button
-                    type="button"
-                    className="btn btn-danger flex-fill py-2"
-                    data-bs-toggle="modal"
-                    data-bs-target="#modalremove"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      fill="currentColor"
-                      className="bi bi-trash-fill"
-                    >
-                      <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"></path>
-                    </svg>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </DataTable>
+                      <button
+                        type="button"
+                        className="btn btn-danger flex-fill py-2"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modalremove"
+                      >
+                        <i className="bi bi-trash-fill"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </DataTable>
+        )}
       </div>
 
       {/* Modal remover */}
@@ -205,7 +124,9 @@ export default function Estoque() {
                 aria-label="Close"
               ></button>
             </div>
-            <div className="modal-body">Tem certeza que deseja excluir o produto?</div>
+            <div className="modal-body">
+              Tem certeza que deseja excluir o produto?
+            </div>
             <div className="modal-footer">
               <button
                 type="button"
@@ -214,16 +135,22 @@ export default function Estoque() {
               >
                 Cancelar
               </button>
-
-              {/* aqui chama o toast "liveToast" */}
-              <button
-                type="button"
-                className="btn btn-danger"
-                data-bs-dismiss="modal"
-                onClick={() => showToast("liveToast")}
-              >
-                Remover
-              </button>
+              {produtos.map((produto) => (
+                <button
+                  key={produto.id}
+                  type="button"
+                  className="btn btn-danger"
+                  data-bs-dismiss="modal"
+                  onClick={async () => {
+                    showToast("liveToast");
+                      await ExcluirProduto(produto.id); // aguarda a exclusão
+                      // se quiser atualizar a lista sem recarregar:
+                      // setProdutos(produtos.filter(p => p.id !== produto.id));
+                  }}
+                >
+                  Remover
+                </button>
+              ))}
             </div>
           </div>
         </div>
@@ -256,8 +183,7 @@ export default function Estoque() {
                   type="text"
                   className="form-control mb-3"
                   id="nome"
-                  placeholder="Pacote de coxinha"
-                  defaultValue={"Pacote de coxinha"}
+                  placeholder="Nome do produto"
                 />
                 <label htmlFor="qtd" className="form-label">
                   Quantidade
@@ -266,7 +192,7 @@ export default function Estoque() {
                   type="number"
                   className="form-control mb-3"
                   id="qtd"
-                  placeholder="15"
+                  placeholder="0"
                 />
                 <label htmlFor="preco" className="form-label">
                   Preço
@@ -275,7 +201,7 @@ export default function Estoque() {
                   type="text"
                   className="form-control mb-3"
                   id="preco"
-                  placeholder="R$ 20,00"
+                  placeholder="R$ 0,00"
                 />
               </form>
             </div>
@@ -287,8 +213,6 @@ export default function Estoque() {
               >
                 Cancelar
               </button>
-
-              {/* aqui chama o toast "edit" */}
               <button
                 type="button"
                 className="btn btn-primary"
@@ -302,7 +226,7 @@ export default function Estoque() {
         </div>
       </div>
 
-      {/* TOASTS (containers) */}
+      {/* TOASTS */}
       <div className="toast-container position-fixed bottom-0 end-0 p-3">
         <div
           id="liveToast"
