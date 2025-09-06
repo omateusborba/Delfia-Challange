@@ -1,8 +1,8 @@
 package org.example.dao;
 
-import java.sql.*;
-
 import org.example.factory.Factory;
+
+import java.sql.*;
 
 public class VendaDAO {
     private Connection conexao;
@@ -11,14 +11,28 @@ public class VendaDAO {
         this.conexao = Factory.getConnection();
     }
 
-    public void realizarVenda(String nomeProduto, int quantidadeVendida) {
+    // Classe auxiliar para retornar o resultado da venda
+    public static class ResultadoVenda {
+        public boolean sucesso;
+        public String mensagem;
+        public int idProduto;
+        public double subtotal;
+
+        public ResultadoVenda(boolean sucesso, String mensagem, int idProduto, double subtotal) {
+            this.sucesso = sucesso;
+            this.mensagem = mensagem;
+            this.idProduto = idProduto;
+            this.subtotal = subtotal;
+        }
+    }
+
+    public ResultadoVenda realizarVenda(String nomeProduto, int quantidadeVendida) {
         String sqlBusca = "SELECT id_produto, qt_produto, vl_preco FROM t_estoque WHERE nm_produto = ?";
         String sqlAtualiza = "UPDATE t_estoque SET qt_produto = ? WHERE id_produto = ?";
 
-        try (
-                PreparedStatement stmtBusca = conexao.prepareStatement(sqlBusca)
-        ) {
+        try (PreparedStatement stmtBusca = conexao.prepareStatement(sqlBusca)) {
             stmtBusca.setString(1, nomeProduto);
+
             try (ResultSet rs = stmtBusca.executeQuery()) {
                 if (rs.next()) {
                     int idProduto = rs.getInt("id_produto");
@@ -28,6 +42,7 @@ public class VendaDAO {
                     if (estoqueAtual >= quantidadeVendida) {
                         int novoEstoque = estoqueAtual - quantidadeVendida;
 
+                        // Atualiza estoque
                         try (PreparedStatement stmtAtualiza = conexao.prepareStatement(sqlAtualiza)) {
                             stmtAtualiza.setInt(1, novoEstoque);
                             stmtAtualiza.setInt(2, idProduto);
@@ -36,21 +51,37 @@ public class VendaDAO {
 
                         double subtotal = preco * quantidadeVendida;
 
-                        // Registrar venda
-                        System.out.println("Venda realizada com sucesso!!");
-                        System.out.printf("Produto: %s | Quantidade: %d | Subtotal: R$ %.2f%n",
-                                nomeProduto, quantidadeVendida, subtotal);
+                        return new ResultadoVenda(
+                                true,
+                                "Venda realizada com sucesso!",
+                                idProduto,
+                                subtotal
+                        );
+
                     } else {
-                        System.out.println("Estoque insuficiente! Estoque atual: " + estoqueAtual);
+                        return new ResultadoVenda(
+                                false,
+                                "Estoque insuficiente! Disponível: " + estoqueAtual,
+                                -1,
+                                0
+                        );
                     }
                 } else {
-                    System.out.println("Produto não encontrado.");
+                    return new ResultadoVenda(
+                            false,
+                            "Produto não encontrado.",
+                            -1,
+                            0
+                    );
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Erro ao realizar venda: " + e.getMessage());
+            return new ResultadoVenda(
+                    false,
+                    "Erro ao realizar venda: " + e.getMessage(),
+                    -1,
+                    0
+            );
         }
     }
 }
-
-
