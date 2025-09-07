@@ -24,31 +24,6 @@ export default function Estoque() {
     t.show();
   };
 
-  // Adicionar cliente
-  const AdicionarCliente = async () => {
-    if (!nome || !instagram || !telefone) {
-      alert("Preencha todos os campos!");
-      return;
-    }
-
-    const novoCliente = {
-      nome,
-      telefone: String(telefone),
-      instagram: String(instagram),
-    };
-
-    try {
-      const res = await axios.post("http://localhost:8081/clientes", novoCliente);
-      setClientes((prev) => [...prev, res.data]);
-      setNome("");
-      setTelefone("");
-      setInstagram("");
-      showToast("add");
-    } catch (err) {
-      console.error("Erro ao adicionar cliente:", err);
-    }
-  };
-
   // Editar cliente
   const EditarClientes = async () => {
     if (!clienteSelecionado) return;

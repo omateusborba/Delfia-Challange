@@ -2,8 +2,19 @@ import { BarChart } from '../BarChart';
 import { GraficoPizza } from "../GraficoPizza";
 import Vendas from "../Tables/Vendas";
 import { Toast } from "bootstrap";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 export default function Financeiro() {
+    const [pedido, setPedido] = useState([])
+
+    useEffect (()=> {
+        axios.get("http://localhost:8081/vendas")
+        .then((res)=> setPedido(res.data))
+        .catch((err) => console.error("Erro ao buscar pedidos:", err));
+    })
+
+
     const showToast = (id) => {
         const el = document.getElementById(id);
         if (!el) return;
@@ -17,15 +28,17 @@ export default function Financeiro() {
                     <div className="row justify-content-center m-3">
                         <div className="col-12 p-0">
                             <div className="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-2">
-                                <div className="col">
+                                {pedido.map((pedido) => (
+                                    <div className="col">
                                     <div className="card text-bg-success">
                                         <div className="card-body">
-                                            <h5 className="card-title">R$ 500,00</h5>
+                                            <h5 className="card-title">{pedido.vl_total}</h5>
                                             <hr />
                                             <div className="card-text">$ Vendas Mensais</div>
                                         </div>
                                     </div>
                                 </div>
+                                ))}
 
                                 <div className="col">
                                     <div className="card text-bg-primary">
