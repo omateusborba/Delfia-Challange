@@ -5,6 +5,7 @@ import org.example.dao.VendaDAO;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.example.model.Pedido;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -61,5 +62,11 @@ public class VendaResource {
                     .entity("Erro ao realizar venda: " + e.getMessage())
                     .build();
         }
+    }
+
+    @GET
+    public List<Pedido> listarVendas() throws SQLException{
+        PedidoDAO dao = new PedidoDAO();
+        return dao.getTodosPedidos();
     }
 }

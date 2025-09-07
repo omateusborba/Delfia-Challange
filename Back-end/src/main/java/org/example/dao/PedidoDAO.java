@@ -1,9 +1,12 @@
 package org.example.dao;
 
 import org.example.factory.Factory;
+import org.example.model.Estoque;
+import org.example.model.Pedido;
 
 import java.sql.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 public class PedidoDAO {
@@ -73,5 +76,30 @@ public class PedidoDAO {
         public double getSubtotal() {
             return quantidade * valorUnitario;
         }
+    }
+
+    public List<Pedido> getTodosPedidos() {
+        List<Pedido> lista = new ArrayList<>();
+        String sql = "SELECT * FROM t_pedido";
+
+        try (PreparedStatement stmt = conexao.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                int id = rs.getInt("id_pedido");
+                int idCliente = rs.getInt("t_cliente_id_cliente");
+                int idVendedor = rs.getInt("t_login_id_vendedor");
+                String data = rs.getString("dt_pedido");
+                float total = rs.getFloat("vl_total");
+
+                Pedido pedido = new Pedido(id, idCliente, idVendedor, data, total);
+                lista.add(pedido);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Erro ao obter pedidos: " + e.getMessage());
+        }
+
+        return lista;
     }
 }
