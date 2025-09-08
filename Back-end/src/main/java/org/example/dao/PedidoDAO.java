@@ -1,7 +1,6 @@
 package org.example.dao;
 
 import org.example.factory.Factory;
-import org.example.model.Estoque;
 import org.example.model.Pedido;
 
 import java.sql.*;
@@ -24,7 +23,7 @@ public class PedidoDAO {
 
         // calcula o valor total do pedido (somando quantidade * valorUnitario)
         double valorTotal = itens.stream()
-                .mapToDouble(i -> i.quantidade * i.valorUnitario)
+                .mapToDouble(i -> i.valorUnitario)
                 .sum();
 
         int idPedido = -1;
