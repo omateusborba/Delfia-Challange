@@ -6,12 +6,54 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 
 export default function Financeiro() {
-    const [pedido, setPedido] = useState([])
+    const [pedidos, setPedidos] = useState([]);
+    const [totalMensal, setTotalMensal] = useState(0);
+    const [qtdMensal, setQtdMensal] = useState(0);
 
-    useEffect (()=> {
+    useEffect(() => {
         axios.get("http://localhost:8081/vendas")
-        .then((res)=> setPedido(res.data))
-        .catch((err) => console.error("Erro ao buscar pedidos:", err));
+            .then((res) => {
+                const dados = res.data;
+                setPedidos(dados);
+
+                // Pega mês e ano atuais
+                const hoje = new Date();
+                const mesAtual = hoje.getMonth();  // 0 = Janeiro
+                const anoAtual = hoje.getFullYear();
+
+                // Filtra só os pedidos do mês/ano atual
+                const pedidosDoMes = dados.filter(p => {
+                    const dataPedido = new Date(p.dt_pedido);
+                    return (
+                        dataPedido.getMonth() === mesAtual &&
+                        dataPedido.getFullYear() === anoAtual
+                    );
+                });
+
+                // Soma vl_total de todos os pedidos filtrados
+                const total = pedidosDoMes.reduce((acc, p) => acc + Number(p.vl_total), 0);
+                setTotalMensal(total);
+
+                // Quantidade de vendas mensais
+                setQtdMensal(pedidosDoMes.length);
+            })
+            .catch((err) => console.error("Erro ao buscar pedidos:", err));
+    }, []);
+
+    const [clientes, setClientes] = useState([]);
+
+    useEffect(() => {
+        axios.get("http://localhost:8081/clientes")
+            .then((res) => setClientes(res.data))
+            .catch((err) => console.error("Erro ao buscar clientes:", err));
+    }, []);
+
+    const [vendedores, setVendedores] = useState([]);
+
+    useEffect(() => {
+        axios.get("http://localhost:8081/vendedores")
+        .then((res) => setVendedores(res.data))
+        .catch((err) => console.error("Erro ao buscar Vendedores:", err))
     })
 
 
@@ -28,24 +70,22 @@ export default function Financeiro() {
                     <div className="row justify-content-center m-3">
                         <div className="col-12 p-0">
                             <div className="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-2">
-                                {pedido.map((pedido) => (
-                                    <div className="col">
+                                <div className="col">
                                     <div className="card text-bg-success">
                                         <div className="card-body">
-                                            <h5 className="card-title">{pedido.vl_total}</h5>
+                                            <h5 className="card-title">R${totalMensal.toFixed(2).replace(".", ",")}</h5>
                                             <hr />
-                                            <div className="card-text">$ Vendas Mensais</div>
+                                            <div className="card-text">Valor Total Em Vendas Mensais</div>
                                         </div>
                                     </div>
                                 </div>
-                                ))}
 
                                 <div className="col">
                                     <div className="card text-bg-primary">
                                         <div className="card-body">
-                                            <h5 className="card-title">200</h5>
+                                            <h5 className="card-title">{qtdMensal}</h5>
                                             <hr />
-                                            <div className="card-text">Qtd. Vendas Mensais</div>
+                                            <div className="card-text">Quantidade De Vendas Mensais</div>
                                         </div>
                                     </div>
                                 </div>
@@ -53,9 +93,9 @@ export default function Financeiro() {
                                 <div className="col">
                                     <div className="card text-bg-secondary">
                                         <div className="card-body">
-                                            <h5 className="card-title">30</h5>
+                                            <h5 className="card-title">{clientes.length}</h5>
                                             <hr />
-                                            <div className="card-text">Novos Clientes</div>
+                                            <div className="card-text">Total De Clientes</div>
                                         </div>
                                     </div>
                                 </div>
@@ -63,9 +103,9 @@ export default function Financeiro() {
                                 <div className="col">
                                     <div className="card text-bg-dark">
                                         <div className="card-body">
-                                            <h5 className="card-title">3</h5>
+                                            <h5 className="card-title">{vendedores.length}</h5>
                                             <hr />
-                                            <div className="card-text">Vendedores</div>
+                                            <div className="card-text">Total De Vendedores</div>
                                         </div>
                                     </div>
                                 </div>

@@ -105,7 +105,7 @@ export default function Estoque() {
                 <tr key={produto.id_produto}>
                   <td>{produto.nome}</td>
                   <td>{produto.quantidade}</td>
-                  <td>R$ {Number(produto.preco).toFixed(2).replace(".", ",")}</td>
+                  <td>R${Number(produto.preco).toFixed(2).replace(".", ",")}</td>
                   <td>
                     <div className="d-flex gap-2">
                       <button
@@ -175,7 +175,15 @@ export default function Estoque() {
                 <label className="form-label">Quantidade</label>
                 <input type="number" className="form-control mb-3" value={quantidade} onChange={(e) => setQuantidade(e.target.value)} />
                 <label className="form-label">Preço</label>
-                <input className="form-control mb-3" value={preco} onChange={(e) => setPreco(e.target.value)} />
+                <input
+                  className="form-control mb-3"
+                  value={preco.toString().replace(".", ",")}
+                  onChange={(e) => {
+                    // troca vírgula por ponto antes de salvar no estado
+                    const valor = e.target.value.replace(",", ".");
+                    setPreco(valor);
+                  }}
+                />
               </form>
             </div>
             <div className="modal-footer">

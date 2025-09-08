@@ -183,6 +183,7 @@ export default function Vendores() {
             </tr>
           </tbody>
         </DataTable>
+        <h3>No DB não tem nada de email, ve isso com o pedro, o que poe no lugar</h3>
       </div>
 
       {/* Modal remover */}
