@@ -1,14 +1,22 @@
-// Estoque.jsx
-import React from "react";
-import DataTable from "datatables.net-react";
-import DT from "datatables.net-dt";
-import RowReorder from "datatables.net-rowreorder";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import { Toast } from "bootstrap";
 
-DataTable.use(DT);
-DataTable.use(RowReorder);
+export default function Vendedores() {
+  const [vendedores, setVendedores] = useState([]);
+  const [vendedorSelecionado, setVendedorSelecionado] = useState(null);
+  const [nm_usuario, setNm_usuario] = useState("");
+  const [tx_email, setTx_email] = useState("");
+  const [tx_senha, setTx_senha] = useState("");
 
-export default function Vendores() {
+  useEffect(() => {
+    // Buscar vendedores do backend
+    axios
+      .get("http://localhost:8081/vendedores")
+      .then((res) => setVendedores(res.data))
+      .catch((err) => console.error("Erro ao buscar vendedores:", err));
+  }, []);
+
   const showToast = (id) => {
     const el = document.getElementById(id);
     if (!el) return;
@@ -16,210 +24,121 @@ export default function Vendores() {
     t.show();
   };
 
+  // Editar vendedor
+  const EditarVendedores = async () => {
+    if (!vendedorSelecionado) return;
+
+    const dadosAtualizados = {
+      nm_usuario,
+      tx_email,
+      tx_senha
+    };
+
+    try {
+      await axios.put(
+        `http://localhost:8081/vendedores/${vendedorSelecionado.id_vendedor}`,
+        dadosAtualizados
+      );
+      setVendedores((prev) =>
+        prev.map((p) =>
+          p.id_vendedor === vendedorSelecionado.id_vendedor
+            ? { ...p, ...dadosAtualizados }
+            : p
+        )
+      );
+      showToast("edit");
+    } catch (err) {
+      console.error("Erro ao editar:", err);
+    }
+  };
+
+  // Excluir vendedor
+  const ExcluirVendedor = async (id) => {
+    if (!id) return;
+    try {
+      await axios.delete(`http://localhost:8081/vendedores/${id}`);
+      setVendedores((prev) => prev.filter((p) => p.id_vendedor !== id));
+      showToast("liveToast");
+    } catch (err) {
+      console.error("Erro ao deletar:", err);
+    }
+  };
+
   return (
     <>
-
       <div className="table-responsive">
-        <DataTable
-          id="Estoque"
-          className="table table-striped table-bordered"
-          options={{
-          rowReorder: true,
-          responsive: true,
-          language: {
-            lengthMenu: "Mostrar _MENU_ registros por página",
-            zeroRecords: "Nenhum registro encontrado",
-            info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
-            infoEmpty: "Mostrando 0 a 0 de 0 registros",
-            infoFiltered: "(filtrado de _MAX_ registros no total)",
-            search: "Pesquisar:",
-          },
-        }}
-        >
-          <thead>
-            <tr>
-              <th>Nome</th>
-              <th>E-mail</th>
-              <th>Opções</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th>Pedro</th>
-              <td>pedro@gmail.com</td>
-              <td>
-                <div className="d-flex justify-content-center align-items-center gap-2 w-100">
-                  <button
-                    type="button"
-                    className="btn btn-primary flex-fill py-2"
-                    data-bs-toggle="modal"
-                    data-bs-target="#modaledit"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      fill="currentColor"
-                      className="bi bi-pencil-square"
-                    >
-                      <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"></path>
-                      <path
-                        fillRule="evenodd"
-                        d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"
-                      ></path>
-                    </svg>
-                  </button>
-
-                  <button
-                    type="button"
-                    className="btn btn-danger flex-fill py-2"
-                    data-bs-toggle="modal"
-                    data-bs-target="#modalremove"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      fill="currentColor"
-                      className="bi bi-trash-fill"
-                    >
-                      <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"></path>
-                    </svg>
-                  </button>
-                </div>
-              </td>
-            </tr>
-
-            {/* repita linhas conforme precisar */}
-            <tr>
-              <th>Tiago</th>
-              <td>tiago@gmail.com</td>
-              <td className="p-2">
-                <div className="d-flex justify-content-center align-items-center gap-2 w-100">
-                  <button
-                    type="button"
-                    className="btn btn-primary flex-fill py-2"
-                    data-bs-toggle="modal"
-                    data-bs-target="#modaledit"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      fill="currentColor"
-                      className="bi bi-pencil-square"
-                    >
-                      <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"></path>
-                      <path
-                        fillRule="evenodd"
-                        d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"
-                      ></path>
-                    </svg>
-                  </button>
-
-                  <button
-                    type="button"
-                    className="btn btn-danger flex-fill py-2"
-                    data-bs-toggle="modal"
-                    data-bs-target="#modalremove"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      fill="currentColor"
-                      className="bi bi-trash-fill"
-                    >
-                      <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"></path>
-                    </svg>
-                  </button>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <th>Mateus</th>
-              <td>mateus@gmail.com</td>
-              <td className="p-2">
-                <div className="d-flex justify-content-center align-items-center gap-2 w-100">
-                  <button
-                    type="button"
-                    className="btn btn-primary flex-fill py-2"
-                    data-bs-toggle="modal"
-                    data-bs-target="#modaledit"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      fill="currentColor"
-                      className="bi bi-pencil-square"
-                    >
-                      <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"></path>
-                      <path
-                        fillRule="evenodd"
-                        d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"
-                      ></path>
-                    </svg>
-                  </button>
-
-                  <button
-                    type="button"
-                    className="btn btn-danger flex-fill py-2"
-                    data-bs-toggle="modal"
-                    data-bs-target="#modalremove"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      fill="currentColor"
-                      className="bi bi-trash-fill"
-                    >
-                      <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"></path>
-                    </svg>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </DataTable>
-        <h3>No DB não tem nada de email, ve isso com o pedro, o que poe no lugar</h3>
+        {vendedores.length === 0 ? (
+          <h5 style={{ textAlign: "center" }}>
+            Ops... Ainda não temos vendedores por aqui.
+          </h5>
+        ) : (
+          <table className="table table-striped table-bordered">
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Email</th>
+                <th>Opções</th>
+              </tr>
+            </thead>
+            <tbody>
+              {vendedores.map((vendedor) => (
+                <tr key={vendedor.id_vendedor}>
+                  <td>{vendedor.nm_usuario}</td>
+                  <td>{vendedor.tx_email}</td> 
+                  <td>
+                    <div className="d-flex gap-2">
+                      <button
+                        type="button"
+                        className="btn btn-primary flex-fill py-2"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modaledit"
+                        onClick={() => {
+                          setVendedorSelecionado(vendedor);
+                          setNm_usuario(vendedor.nm_usuario);
+                          setTx_email(vendedor.tx_email);
+                          setTx_senha(vendedor.tx_senha);
+                        }}
+                      >
+                        <i className="bi bi-pencil-square"></i>
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-danger flex-fill py-2"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modalremove"
+                        onClick={() => setVendedorSelecionado(vendedor)}
+                      >
+                        <i className="bi bi-trash-fill"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
 
       {/* Modal remover */}
-      <div
-        className="modal fade"
-        id="modalremove"
-        tabIndex={-1}
-        aria-labelledby="modalremoveLabel"
-        aria-hidden="true"
-      >
-        <div className="modal-dialog modal-dialog-centered ">
+      <div className="modal fade" id="modalremove" tabIndex="-1" aria-hidden="true">
+        <div className="modal-dialog modal-dialog-centered">
           <div className="modal-content">
             <div className="modal-header">
-              <button
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
+              <h5 className="modal-title">Remover vendedor</h5>
+              <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div className="modal-body">Tem certeza que deseja excluir o(a) vendedor(a)?</div>
+            <div className="modal-body">Tem certeza que deseja excluir o vendedor?</div>
             <div className="modal-footer">
-              <button
-                type="button"
-                className="btn btn-secondary"
-                data-bs-dismiss="modal"
-              >
+              <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">
                 Cancelar
               </button>
-
-              {/* aqui chama o toast "liveToast" */}
               <button
                 type="button"
                 className="btn btn-danger"
                 data-bs-dismiss="modal"
-                onClick={() => showToast("liveToast")}
+                onClick={() =>
+                  vendedorSelecionado && ExcluirVendedor(vendedorSelecionado.id_vendedor)
+                }
               >
                 Remover
               </button>
@@ -229,93 +148,71 @@ export default function Vendores() {
       </div>
 
       {/* Modal editar */}
-      <div
-        className="modal fade"
-        id="modaledit"
-        tabIndex={-1}
-        aria-labelledby="modaleditLabel"
-        aria-hidden="true"
-      >
-        <div className="modal-dialog modal-dialog-centered ">
+      <div className="modal fade" id="modaledit" tabIndex="-1" aria-hidden="true">
+        <div className="modal-dialog modal-dialog-centered">
           <div className="modal-content">
             <div className="modal-header">
-              <button
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
+              <h5 className="modal-title">Editar Vendedor</h5>
+              <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div className="modal-body">
               <form>
-                <label for="nome" class="form-label">Nome</label>
-                <input type="text" class="form-control mb-3" id="nome" defaultValue={'Nome vendedor(a)'}/>
-                <label for="email" class="form-label">E-mail</label>
-                <input type="email" class="form-control mb-3" id="email"defaultValue={'email@gmail.com'}/>
-                <label for="senha" class="form-label">Senha Atual</label>
-                <input type="password" class="form-control mb-3" id="senha" defaultValue={'senha'} disabled readonly/>
-                <label for="newsenha" class="form-label">Nova Senha</label>
-                <input type="text" class="form-control mb-3" id="newsenha"/>
+                <label className="form-label">Nome</label>
+                <input
+                  className="form-control mb-3"
+                  value={nm_usuario}
+                  onChange={(e) => setNm_usuario(e.target.value)}
+                />
+                <label className="form-label">Email</label>
+                <input
+                  type="email"
+                  className="form-control mb-3"
+                  value={tx_email}
+                  onChange={(e) => setTx_email(e.target.value)}
+                />
+                <label className="form-label">Senha</label>
+                <input
+                  type="password"
+                  className="form-control mb-3"
+                  value={tx_senha}
+                  onChange={(e) => setTx_senha(e.target.value)}
+                />
               </form>
             </div>
             <div className="modal-footer">
-              <button
-                type="button"
-                className="btn btn-secondary"
-                data-bs-dismiss="modal"
-              >
+              <button className="btn btn-secondary" data-bs-dismiss="modal">
                 Cancelar
               </button>
-
-              {/* aqui chama o toast "edit" */}
               <button
-                type="button"
                 className="btn btn-primary"
                 data-bs-dismiss="modal"
-                onClick={() => showToast("edit")}
+                onClick={EditarVendedores}
               >
-                Editar
+                Salvar
               </button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* TOASTS (containers) */}
+      {/* Toasts */}
       <div className="toast-container position-fixed bottom-0 end-0 p-3">
-        <div
-          id="liveToast"
-          className="toast text-bg-danger"
-          role="alert"
-          aria-live="assertive"
-          aria-atomic="true"
-        >
+        <div id="liveToast" className="toast text-bg-danger">
           <div className="d-flex">
-            <div className="toast-body">Vendedor(a) removido(a) com sucesso!</div>
-            <button
-              type="button"
-              className="btn-close me-2 m-auto"
-              data-bs-dismiss="toast"
-              aria-label="Close"
-            ></button>
+            <div className="toast-body">Vendedor removido com sucesso!</div>
+            <button type="button" className="btn-close m-auto" data-bs-dismiss="toast"></button>
           </div>
         </div>
-
-        <div
-          id="edit"
-          className="toast text-bg-primary mt-2"
-          role="alert"
-          aria-live="assertive"
-          aria-atomic="true"
-        >
+        <div id="edit" className="toast text-bg-primary mt-2">
           <div className="d-flex">
-            <div className="toast-body">Vendedor(a) editado(a) com sucesso!</div>
-            <button
-              type="button"
-              className="btn-close me-2 m-auto"
-              data-bs-dismiss="toast"
-              aria-label="Close"
-            ></button>
+            <div className="toast-body">Vendedor editado avec sucesso!</div>
+            <button type="button" className="btn-close m-auto" data-bs-dismiss="toast"></button>
+          </div>
+        </div>
+        <div id="add" className="toast text-bg-success mt-2">
+          <div className="d-flex">
+            <div className="toast-body">Vendedor adicionado com sucesso!</div>
+            <button type="button" className="btn-close m-auto" data-bs-dismiss="toast"></button>
           </div>
         </div>
       </div>

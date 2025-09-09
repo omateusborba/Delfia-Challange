@@ -52,7 +52,7 @@ export default function Vendas() {
   };
 
   return (
-    <div className="container my-4">
+    <div className="table-esponsive">
       {/* Tabela de vendas */}
       <table className="table table-striped table-bordered">
         <thead>
@@ -69,17 +69,11 @@ export default function Vendas() {
           {vendas.map((venda) => (
             <tr key={venda.id_pedido || venda.idPedido}>
               <td>{venda.vendedor}</td>
-              <td>{venda.cliente}</td>
+              <td>{venda.cliente || "Cliente sem cadastro"}</td>
               <td>
-                {venda.itens && Array.isArray(venda.itens) ? (
-                  venda.itens.map((item, index) => (
-                    <div key={index}>
-                      {item.nomeProduto} ({item.quantidade} x R$ {item.valorUnitario?.toFixed(2)})
-                    </div>
-                  ))
-                ) : (
-                  typeof venda.itens === 'string' ? venda.itens : 'Nenhum item'
-                )}
+                {venda.itens && venda.itens.length > 0
+                  ? venda.itens.map((i, idx) => <div key={idx}>{i}</div>)
+                  : "(sem itens)"}
               </td>
               <td>R$ {Number(venda.vl_total).toFixed(2).replace(".", ",")}</td>
               <td>{formatarDataBrasileira(venda.dt_pedido)}</td>

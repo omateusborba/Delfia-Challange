@@ -68,14 +68,13 @@ export default function Financeiro() {
     // ---------------------
     // Carregar produtos (estoque)
     useEffect(() => {
-        axios.get("http://localhost:8081/produtos")  // Corrigido para /produtos
+        axios.get("http://localhost:8081/produtos")  
             .then((res) => {
                 console.log("PRODUTOS API:", res.data);
                 setProdutos(res.data);
             })
             .catch((err) => {
                 console.error("Erro ao buscar produtos:", err);
-                // Fallback para /estoque caso /produtos não exista
                 axios.get("http://localhost:8081/estoque")
                     .then((res) => {
                         console.log("ESTOQUE API:", res.data);
@@ -109,68 +108,61 @@ export default function Financeiro() {
     };
 
     // ---------------------
-    // Adicionar venda (CORRIGIDO - envia apenas o primeiro item)
-    const adicionarVenda = () => {
+    // Adicionar venda (corrigido)
+    const adicionarVenda = async () => {
         if (!novaVenda.idCliente || !novaVenda.idVendedor || novaVenda.itens.length === 0) {
             alert('Preencha todos os campos obrigatórios!');
             return;
         }
 
-        const primeiroItem = novaVenda.itens[0];
-        if (!primeiroItem.idProduto) {
-            alert('Selecione um produto!');
-            return;
-        }
+        const itensVenda = novaVenda.itens.map(item => {
+            const produtoSelecionado = produtos.find(p =>
+                String(p.id_produto || p.id) === String(item.idProduto)
+            );
 
-        // Encontra o produto selecionado
-        const produtoSelecionado = produtos.find(p => 
-            String(p.id_produto || p.id) === String(primeiroItem.idProduto)
-        );
+            if (!produtoSelecionado) {
+                throw new Error("Produto não encontrado!");
+            }
 
-        if (!produtoSelecionado) {
-            alert('Produto não encontrado!');
-            return;
-        }
+            return {
+                nomeProduto: produtoSelecionado.nm_produto || produtoSelecionado.nome,
+                quantidade: parseInt(item.quantidade)
+            };
+        });
 
-        // Prepara os dados no formato que o backend espera
         const vendaRequest = {
-            nomeProduto: produtoSelecionado.nm_produto || produtoSelecionado.nome,
-            quantidadeVendida: primeiroItem.quantidade,
             idCliente: parseInt(novaVenda.idCliente),
-            idVendedor: parseInt(novaVenda.idVendedor)
+            idVendedor: parseInt(novaVenda.idVendedor),
+            itens: itensVenda
         };
 
-        console.log("Enviando venda:", vendaRequest);
+        console.log("Enviando venda com múltiplos itens:", vendaRequest);
 
-        axios.post("http://localhost:8081/vendas", vendaRequest)
-            .then((response) => {
-                console.log("Venda criada:", response.data);
-                showToast("taddvenda");
-                
-                // Limpar formulário
-                setNovaVenda({
-                    idCliente: '',
-                    idVendedor: '',
-                    itens: []
-                });
-                
-                // Recarregar vendas
-                return axios.get("http://localhost:8081/vendas");
-            })
-            .then((res) => {
-                setPedidos(res.data);
-                // Fechar modal
-                const modal = document.getElementById('modaladdvendas');
-                const bsModal = bootstrap.Modal.getInstance(modal);
-                if (bsModal) {
-                    bsModal.hide();
-                }
-            })
-            .catch((err) => {
-                console.error("Erro completo ao adicionar venda:", err);
-                console.error("Resposta do erro:", err.response?.data);
-                alert('Erro ao adicionar venda: ' + (err.response?.data || err.message));
+        try {
+            const response = await axios.post("http://localhost:8081/vendas", vendaRequest);
+            console.log("Venda criada:", response.data);
+            showToast("taddvenda");
+            setNovaVenda({
+                idCliente: '',
+                idVendedor: '',
+                itens: []
             });
+            
+            // Atualizar a lista de pedidos
+            const res = await axios.get("http://localhost:8081/vendas");
+            setPedidos(res.data);
+            
+            // Fechar o modal
+            const modal = document.getElementById('modaladdvendas');
+            const bsModal = bootstrap.Modal.getInstance(modal);
+            if (bsModal) bsModal.hide();
+            
+            // Recarregar a página após sucesso
+            window.location.reload();
+        } catch (err) {
+            console.error("Erro ao adicionar venda:", err);
+            alert('Erro ao adicionar venda: ' + (err.response?.data || err.message));
+        }
     };
 
     // ---------------------
@@ -424,7 +416,7 @@ export default function Financeiro() {
                 <div id="taddvenda" className="toast text-bg-success" role="alert" aria-live="assertive" aria-atomic="true">
                     <div className="d-flex">
                         <div className="toast-body">Venda adicionada com sucesso!</div>
-                        <button type="button" className="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                        <button type="button" className="btn-close me-2 m-auto" data-bs-idsmiss="toast" aria-label="Close"></button>
                     </div>
                 </div>
             </div>

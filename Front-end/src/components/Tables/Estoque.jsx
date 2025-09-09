@@ -24,6 +24,13 @@ export default function Estoque() {
     t.show();
   };
 
+  // Função auxiliar para formatar preço
+  const formatarPrecoParaNumero = (valor) => {
+    if (typeof valor === 'number') return valor;
+    if (typeof valor === 'string') return Number(valor.replace(",", "."));
+    return 0;
+  };
+
   // Adicionar produto
   const AdicionarProduto = async () => {
     if (!nome || !quantidade || !preco) {
@@ -34,13 +41,15 @@ export default function Estoque() {
     const novoProduto = {
       nome,
       quantidade: Number(quantidade),
-      preco: Number(preco.replace(",", ".")),
+      preco: formatarPrecoParaNumero(preco),
     };
 
     try {
       const res = await axios.post("http://localhost:8081/estoque", novoProduto);
       setProdutos((prev) => [...prev, res.data]);
-      setNome(""); setQuantidade(""); setPreco("");
+      setNome(""); 
+      setQuantidade(""); 
+      setPreco("");
       showToast("add");
     } catch (err) {
       console.error("Erro ao adicionar produto:", err);
@@ -54,7 +63,7 @@ export default function Estoque() {
     const dadosAtualizados = {
       nome,
       quantidade: Number(quantidade),
-      preco: Number(preco.replace(",", ".")),
+      preco: formatarPrecoParaNumero(preco),
     };
 
     try {
@@ -83,6 +92,19 @@ export default function Estoque() {
     }
   };
 
+  // Formatar preço para exibição
+  const formatarPrecoExibicao = (valor) => {
+    if (typeof valor === 'number') {
+      return valor.toFixed(2).replace(".", ",");
+    }
+    if (typeof valor === 'string') {
+      // Se for string, tenta converter para número primeiro
+      const numero = parseFloat(valor.replace(",", "."));
+      return isNaN(numero) ? valor : numero.toFixed(2).replace(".", ",");
+    }
+    return "0,00";
+  };
+
   return (
     <>
       <div className="table-responsive">
@@ -105,7 +127,7 @@ export default function Estoque() {
                 <tr key={produto.id_produto}>
                   <td>{produto.nome}</td>
                   <td>{produto.quantidade}</td>
-                  <td>R${Number(produto.preco).toFixed(2).replace(".", ",")}</td>
+                  <td>R$ {formatarPrecoExibicao(produto.preco)}</td>
                   <td>
                     <div className="d-flex gap-2">
                       <button
@@ -114,13 +136,15 @@ export default function Estoque() {
                         data-bs-toggle="modal"
                         data-bs-target="#modaledit"
                         onClick={() => {
-                          setProdutoSelecionado(produto); setNome(produto.nome);
-                          setQuantidade(produto.quantidade);
-                          setPreco(produto.preco);
+                          setProdutoSelecionado(produto); 
+                          setNome(produto.nome);
+                          setQuantidade(produto.quantidade.toString());
+                          setPreco(formatarPrecoExibicao(produto.preco));
                         }} >
                         <i className="bi bi-pencil-square"></i>
                       </button>
-                      <button type="button"
+                      <button 
+                        type="button"
                         className="btn btn-danger flex-fill py-2"
                         data-bs-toggle="modal"
                         data-bs-target="#modalremove"
@@ -171,16 +195,25 @@ export default function Estoque() {
             <div className="modal-body">
               <form>
                 <label className="form-label">Nome</label>
-                <input className="form-control mb-3" value={nome} onChange={(e) => setNome(e.target.value)} />
+                <input 
+                  className="form-control mb-3" 
+                  value={nome} 
+                  onChange={(e) => setNome(e.target.value)} 
+                />
                 <label className="form-label">Quantidade</label>
-                <input type="number" className="form-control mb-3" value={quantidade} onChange={(e) => setQuantidade(e.target.value)} />
+                <input 
+                  type="number" 
+                  className="form-control mb-3" 
+                  value={quantidade} 
+                  onChange={(e) => setQuantidade(e.target.value)} 
+                />
                 <label className="form-label">Preço</label>
                 <input
                   className="form-control mb-3"
-                  value={preco.toString().replace(".", ",")}
+                  value={preco}
                   onChange={(e) => {
-                    // troca vírgula por ponto antes de salvar no estado
-                    const valor = e.target.value.replace(",", ".");
+                    // Permite apenas números, vírgula e ponto
+                    const valor = e.target.value.replace(/[^\d,.]/g, '');
                     setPreco(valor);
                   }}
                 />
@@ -188,7 +221,9 @@ export default function Estoque() {
             </div>
             <div className="modal-footer">
               <button className="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-              <button className="btn btn-primary" data-bs-dismiss="modal" onClick={EditarProduto}>Salvar</button>
+              <button className="btn btn-primary" data-bs-dismiss="modal" onClick={EditarProduto}>
+                Salvar
+              </button>
             </div>
           </div>
         </div>
