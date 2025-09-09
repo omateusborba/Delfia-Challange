@@ -1,278 +1,125 @@
-import DataTable from "datatables.net-react";
-import DT from "datatables.net-dt";
-import RowReorder from "datatables.net-rowreorder";
+// src/pages/Vendas.jsx
+import { useEffect, useState } from "react";
+import axios from "axios";
 import { Toast } from "bootstrap";
 
-DataTable.use(DT);
-DataTable.use(RowReorder);
-
 export default function Vendas() {
+  const [vendas, setVendas] = useState([]);
+  const [vendaSelecionada, setVendaSelecionada] = useState(null);
+
   const showToast = (id) => {
-      const el = document.getElementById(id);
-      if (!el) return;
-      const t = new Toast(el);
-      t.show();
-    };
+    const el = document.getElementById(id);
+    if (!el) return;
+    const t = new Toast(el);
+    t.show();
+  };
+
+  // 🔹 Buscar vendas ao carregar
+  useEffect(() => {
+    axios
+      .get("http://localhost:8081/vendas")
+      .then((res) => setVendas(res.data))
+      .catch((err) => console.error("Erro ao buscar vendas:", err));
+  }, []);
+
+  // 🔹 Remover venda
+  const removerVenda = () => {
+    if (!vendaSelecionada) return;
+
+    // Usa id_pedido ou idPedido dependendo do que vem do backend
+    const id = vendaSelecionada.id_pedido || vendaSelecionada.idPedido;
+
+    axios
+      .delete(`http://localhost:8081/vendas/${id}`)
+      .then(() => {
+        setVendas(vendas.filter((v) => (v.id_pedido || v.idPedido) !== id));
+        showToast("tremovevenda");
+      })
+      .catch((err) => console.error("Erro ao remover:", err));
+  };
+
+
+  // 🔹 Selecionar venda para remoção
+  const selecionarParaRemocao = (venda) => {
+    setVendaSelecionada(venda);
+  };
+
+
+
+  const formatarDataBrasileira = (dataString) => {
+    const date = new Date(dataString + 'T00:00:00-03:00');
+    return date.toLocaleDateString('pt-BR');
+  };
 
   return (
-    <>
-    <div className="table-responsive">  {/* wrapper do Bootstrap */}
-      <DataTable
-        id="Vendas"
-        className="table table-striped table-bordered"
-        options={{
-          rowReorder: true,
-          responsive: true,
-          language: {
-            lengthMenu: "Mostrar _MENU_ registros por página",
-            zeroRecords: "Nenhum registro encontrado",
-            info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
-            infoEmpty: "Mostrando 0 a 0 de 0 registros",
-            infoFiltered: "(filtrado de _MAX_ registros no total)",
-            search: "Pesquisar:",
-          },
-        }}
-      >
+    <div className="container my-4">
+      {/* Tabela de vendas */}
+      <table className="table table-striped table-bordered">
         <thead>
           <tr>
             <th>Vendedor</th>
             <th>Cliente</th>
-            <th>Produtos</th>
-            <th>Valor</th>
+            <th>Itens</th>
+            <th>Valor Total</th>
             <th>Data</th>
-            <th>Opções</th>
+            <th>Ações</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <th>Julio</th>
-            <th>Pedro</th>
-            <td>3</td>
-            <td>R$ 20,00</td>
-            <td>20/01/9999</td>
-            <td className="p-2">
-                <div className="d-flex justify-content-center align-items-center gap-2 w-100">
-                  <button
-                    type="button"
-                    className="btn btn-primary flex-fill py-2"
-                    data-bs-toggle="modal"
-                    data-bs-target="#modaledit"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      fill="currentColor"
-                      className="bi bi-pencil-square"
-                    >
-                      <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"></path>
-                      <path
-                        fillRule="evenodd"
-                        d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"
-                      ></path>
-                    </svg>
-                  </button>
-
+          {vendas.map((venda) => (
+            <tr key={venda.id_pedido || venda.idPedido}>
+              <td>{venda.vendedor}</td>
+              <td>{venda.cliente}</td>
+              <td>
+                {venda.itens && Array.isArray(venda.itens) ? (
+                  venda.itens.map((item, index) => (
+                    <div key={index}>
+                      {item.nomeProduto} ({item.quantidade} x R$ {item.valorUnitario?.toFixed(2)})
+                    </div>
+                  ))
+                ) : (
+                  typeof venda.itens === 'string' ? venda.itens : 'Nenhum item'
+                )}
+              </td>
+              <td>R$ {Number(venda.vl_total).toFixed(2).replace(".", ",")}</td>
+              <td>{formatarDataBrasileira(venda.dt_pedido)}</td>
+              <td>
+                <div className="d-flex gap-2">
                   <button
                     type="button"
                     className="btn btn-danger flex-fill py-2"
                     data-bs-toggle="modal"
                     data-bs-target="#modalremove"
+                    onClick={() => selecionarParaRemocao(venda)}
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      fill="currentColor"
-                      className="bi bi-trash-fill"
-                    >
-                      <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"></path>
-                    </svg>
+                    <i className="bi bi-trash-fill"></i>
                   </button>
                 </div>
               </td>
-          </tr>
-          <tr>
-            <th>Julio</th>
-            <th>Mateus</th>
-            <td>6</td>
-            <td>R$ 20,00</td>
-            <td>20/01/9999</td>
-            <td className="p-2">
-                <div className="d-flex justify-content-center align-items-center gap-2 w-100">
-                  <button
-                    type="button"
-                    className="btn btn-primary flex-fill py-2"
-                    data-bs-toggle="modal"
-                    data-bs-target="#modaledit"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      fill="currentColor"
-                      className="bi bi-pencil-square"
-                    >
-                      <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"></path>
-                      <path
-                        fillRule="evenodd"
-                        d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"
-                      ></path>
-                    </svg>
-                  </button>
-
-                  <button
-                    type="button"
-                    className="btn btn-danger flex-fill py-2"
-                    data-bs-toggle="modal"
-                    data-bs-target="#modalremove"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      fill="currentColor"
-                      className="bi bi-trash-fill"
-                    >
-                      <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"></path>
-                    </svg>
-                  </button>
-                </div>
-              </td>
-          </tr>
-          <tr>
-            <th>Julio</th>
-            <th>Rafael</th>
-            <td>10</td>
-            <td>R$ 20,00</td>
-            <td>20/01/9999</td>
-            <td className="p-2">
-                <div className="d-flex justify-content-center align-items-center gap-2 w-100">
-                  <button
-                    type="button"
-                    className="btn btn-primary flex-fill py-2"
-                    data-bs-toggle="modal"
-                    data-bs-target="#modaledit"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      fill="currentColor"
-                      className="bi bi-pencil-square"
-                    >
-                      <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"></path>
-                      <path
-                        fillRule="evenodd"
-                        d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"
-                      ></path>
-                    </svg>
-                  </button>
-
-                  <button
-                    type="button"
-                    className="btn btn-danger flex-fill py-2"
-                    data-bs-toggle="modal"
-                    data-bs-target="#modalremove"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      fill="currentColor"
-                      className="bi bi-trash-fill"
-                    >
-                      <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"></path>
-                    </svg>
-                  </button>
-                </div>
-              </td>
-          </tr>
-          <tr>
-            <th>Cesar</th>
-            <th>Lucas</th>
-            <td>1</td>
-            <td>R$ 20,00</td>
-            <td>20/01/9999</td>
-            <td className="p-2">
-                <div className="d-flex justify-content-center align-items-center gap-2 w-100">
-                  <button
-                    type="button"
-                    className="btn btn-primary flex-fill py-2"
-                    data-bs-toggle="modal"
-                    data-bs-target="#modaledit"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      fill="currentColor"
-                      className="bi bi-pencil-square"
-                    >
-                      <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"></path>
-                      <path
-                        fillRule="evenodd"
-                        d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"
-                      ></path>
-                    </svg>
-                  </button>
-
-                  <button
-                    type="button"
-                    className="btn btn-danger flex-fill py-2"
-                    data-bs-toggle="modal"
-                    data-bs-target="#modalremove"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      fill="currentColor"
-                      className="bi bi-trash-fill"
-                    >
-                      <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"></path>
-                    </svg>
-                  </button>
-                </div>
-              </td>
-          </tr>
+            </tr>
+          ))}
         </tbody>
-      </DataTable>
-    </div>
-    
-      <div
-        className="modal fade"
-        id="modalremove"
-        tabIndex={-1}
-        aria-labelledby="modalremoveLabel"
-        aria-hidden="true"
-      >
-        <div className="modal-dialog modal-dialog-centered ">
+      </table>
+
+      {/* Modal Remover */}
+      <div className="modal fade" id="modalremove" tabIndex="-1">
+        <div className="modal-dialog modal-dialog-centered">
           <div className="modal-content">
             <div className="modal-header">
-              <button
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
+              <h5 className="modal-title">Remover Venda</h5>
+              <button className="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div className="modal-body">Tem certeza que deseja excluir a venda?</div>
+            <div className="modal-body">
+              Tem certeza que deseja remover esta venda?
+            </div>
             <div className="modal-footer">
-              <button
-                type="button"
-                className="btn btn-secondary"
-                data-bs-dismiss="modal"
-              >
+              <button className="btn btn-secondary" data-bs-dismiss="modal">
                 Cancelar
               </button>
-
-              {/* aqui chama o toast "tremovevenda" */}
               <button
-                type="button"
                 className="btn btn-danger"
                 data-bs-dismiss="modal"
-                onClick={() => showToast("tremovevenda")}
+                onClick={removerVenda}
               >
                 Remover
               </button>
@@ -281,115 +128,14 @@ export default function Vendas() {
         </div>
       </div>
 
-      {/* Modal editar */}
-      <div
-        className="modal fade"
-        id="modaledit"
-        tabIndex={-1}
-        aria-labelledby="modaleditLabel"
-        aria-hidden="true"
-      >
-        <div className="modal-dialog modal-dialog-centered modal-lg">
-          <div className="modal-content">
-            <div className="modal-header">
-              <button
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
-            </div>
-            <div className="modal-body">
-              <form>
-                <label for="cliente" className="form-label">Nome do Cliente</label>
-                                        <input type="text" className="form-control mb-3" id="cliente" placeholder="Digite o nome do cliente" />
-                                        <label for="data" className="form-label">Data</label>
-                                        <input type="date" className="form-control mb-3" id="data" />
-                                        <table className="table table-bordered align-center">
-                                            <thead className="table-light">
-                                            <tr>
-                                                <th><button type="button" className="btn btn-primary">Adicionar</button></th>
-                                                <th>Produto</th>
-                                                <th>Quantidade</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            <tr>
-                                                <td><button type="button" className="btn btn-danger">Excluir</button></td>
-                                                <td>
-                                                <select class="form-select" aria-label="Nome do produto">
-                                                    <option selected>Nome do produto</option>
-                                                </select>
-                                                </td>
-                                                <td>
-                                                <input type="number" className="form-control mb-3" min="1" value="1" />
-                                                </td>
-                                            </tr>
-                                            </tbody>
-                                        </table>
-              </form>
-            </div>
-            <div className="modal-footer">
-              <button
-                type="button"
-                className="btn btn-secondary"
-                data-bs-dismiss="modal"
-              >
-                Cancelar
-              </button>
 
-              {/* aqui chama o toast "edit" */}
-              <button
-                type="button"
-                className="btn btn-primary"
-                data-bs-dismiss="modal"
-                onClick={() => showToast("edit")}
-              >
-                Editar
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
 
-      {/* TOASTS (containers) */}
+      {/* Toasts */}
       <div className="toast-container position-fixed bottom-0 end-0 p-3">
-        <div
-          id="tremovevenda"
-          className="toast text-bg-danger"
-          role="alert"
-          aria-live="assertive"
-          aria-atomic="true"
-        >
-          <div className="d-flex">
-            <div className="toast-body">Venda removida com sucesso!</div>
-            <button
-              type="button"
-              className="btn-close me-2 m-auto"
-              data-bs-dismiss="toast"
-              aria-label="Close"
-            ></button>
-          </div>
-        </div>
-
-        <div
-          id="edit"
-          className="toast text-bg-primary mt-2"
-          role="alert"
-          aria-live="assertive"
-          aria-atomic="true"
-        >
-          <div className="d-flex">
-            <div className="toast-body">Venda editada com sucesso!</div>
-            <button
-              type="button"
-              className="btn-close me-2 m-auto"
-              data-bs-dismiss="toast"
-              aria-label="Close"
-            ></button>
-          </div>
+        <div id="tremovevenda" className="toast text-bg-danger">
+          <div className="toast-body">Venda removida com sucesso</div>
         </div>
       </div>
-  </>
+    </div>
   );
 }
