@@ -1,10 +1,8 @@
 package org.example.resource;
 
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.example.dao.VendedorDAO;
 import org.example.model.Vendedor;
 
@@ -20,5 +18,28 @@ public class VendedorResource {
     public List<Vendedor> listarVendedores() throws SQLException{
         VendedorDAO dao = new VendedorDAO();
         return dao.getTodosVendedores();
+    }
+
+    @POST
+    public void adicionaVendedor(Vendedor vendedor) throws SQLException {
+        VendedorDAO dao = new VendedorDAO();
+        dao.adicionaVendedor(vendedor);
+    }
+
+    @PUT
+    @Path("/{id}")
+    public Response atualizaVendedor(@PathParam("id") int id, Vendedor vendedor) throws SQLException{
+        VendedorDAO dao = new VendedorDAO();
+        vendedor.setId_vendedor(id);
+        dao.atualizaVendedor(vendedor);
+        return Response.ok(vendedor).build();
+    }
+
+    @DELETE
+    @Path("/{id}")
+    public Response deletarVendedor(@PathParam("id") int id) throws SQLException{
+        VendedorDAO dao = new VendedorDAO();
+        dao.deletarVendedor(id);
+        return Response.noContent().build();
     }
 }

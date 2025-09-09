@@ -3,27 +3,21 @@ package org.example.model;
 public class Vendedor {
     public Integer id_vendedor;
     public String nm_usuario;
+    public String tx_email;
     private String tx_senha;
     public boolean is_gerente;
 
-    public Vendedor(){
-
+    public Vendedor() {
     }
 
-    public Vendedor(Integer id_vendedor, String nm_usuario, String tx_senha, boolean is_gerente){
+    public Vendedor(Integer id_vendedor, String nm_usuario, String tx_senha, boolean is_gerente) {
         this.id_vendedor = id_vendedor;
         this.nm_usuario = nm_usuario;
         this.tx_senha = tx_senha;
         this.is_gerente = is_gerente;
     }
 
-    public Vendedor(Integer id_vendedor, String nm_usuario, boolean is_gerente){
-        this.id_vendedor = id_vendedor;
-        this.nm_usuario = nm_usuario;
-        this.is_gerente = is_gerente;
-    }
-
-    public Vendedor(String nm_usuario, String tx_senha, boolean is_gerente){
+    public Vendedor(String nm_usuario, String tx_senha, boolean is_gerente) {
         this.nm_usuario = nm_usuario;
         this.tx_senha = tx_senha;
         this.is_gerente = is_gerente;
@@ -43,6 +37,14 @@ public class Vendedor {
 
     public void setNm_usuario(String nm_usuario) {
         this.nm_usuario = nm_usuario;
+    }
+
+    public String getTx_email() {
+        return tx_email;
+    }
+
+    public void setTx_email(String tx_email) {
+        this.tx_email = tx_email;
     }
 
     public String getTx_senha() {

@@ -18,10 +18,14 @@ public class VendaResource {
 
     // DTO simples só para receber os dados da venda no corpo da requisição
     public static class VendaRequest {
-        public String nomeProduto;
-        public int quantidadeVendida;
         public int idCliente;
         public int idVendedor;
+        public List<ItemVenda> itens; // <<--- agora existe a lista de itens
+
+        public static class ItemVenda {
+            public String nomeProduto;
+            public int quantidade;
+        }
     }
 
     @POST
@@ -30,29 +34,30 @@ public class VendaResource {
             VendaDAO vendaDAO = new VendaDAO();
             PedidoDAO pedidoDAO = new PedidoDAO();
 
-            // 1. Valida e baixa estoque
-            VendaDAO.ResultadoVenda resultado =
-                    vendaDAO.realizarVenda(vendaRequest.nomeProduto, vendaRequest.quantidadeVendida);
+            List<PedidoDAO.ItemPedido> itensPedido = new ArrayList<>();
 
-            if (!resultado.sucesso) {
-                return Response.status(Response.Status.BAD_REQUEST)
-                        .entity(resultado.mensagem)
-                        .build();
+            // Processa cada item da venda
+            for (VendaRequest.ItemVenda item : vendaRequest.itens) {
+                VendaDAO.ResultadoVenda resultado = vendaDAO.realizarVenda(item.nomeProduto, item.quantidade);
+
+                if (!resultado.sucesso) {
+                    return Response.status(Response.Status.BAD_REQUEST)
+                            .entity(resultado.mensagem)
+                            .build();
+                }
+
+                itensPedido.add(new PedidoDAO.ItemPedido(
+                        resultado.idProduto,
+                        item.quantidade,
+                        resultado.precoUnitario // Preço unitário fixado no momento da venda
+                ));
             }
 
-            // 2. Cria lista de itens do pedido
-            List<PedidoDAO.ItemPedido> itens = new ArrayList<>();
-            itens.add(new PedidoDAO.ItemPedido(
-                    resultado.idProduto,
-                    vendaRequest.quantidadeVendida,
-                    resultado.subtotal
-            ));
-
-            // 3. Cria pedido
+            // Cria pedido com todos os itens
             int idPedido = pedidoDAO.criarPedido(
                     vendaRequest.idCliente,
                     vendaRequest.idVendedor,
-                    itens
+                    itensPedido
             );
 
             return Response.ok("Venda registrada com sucesso! Pedido ID: " + idPedido).build();
