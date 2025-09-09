@@ -65,8 +65,30 @@ public class VendaResource {
     }
 
     @GET
-    public List<Pedido> listarVendas() throws SQLException{
+    public List<Pedido> listarVendas() throws SQLException {
         PedidoDAO dao = new PedidoDAO();
         return dao.getTodosPedidos();
+    }
+
+    @DELETE
+    @Path("/{idPedido}")
+    public Response removerVenda(@PathParam("idPedido") int idPedido) {
+        try {
+            PedidoDAO pedidoDAO = new PedidoDAO();
+            boolean removido = pedidoDAO.removerPedido(idPedido);
+
+            if (removido) {
+                return Response.ok("Venda removida com sucesso!").build();
+            } else {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity("Venda não encontrada com ID: " + idPedido)
+                        .build();
+            }
+
+        } catch (SQLException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Erro ao remover venda: " + e.getMessage())
+                    .build();
+        }
     }
 }
