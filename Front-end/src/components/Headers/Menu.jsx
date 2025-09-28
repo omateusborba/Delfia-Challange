@@ -51,6 +51,9 @@ export default function Menu() {
             <Link to="/clientes" className="nav-link">Clientes</Link>
           </li>
           <li className="nav-item">
+            <Link to="/ia" className="nav-link">Flux IA</Link>
+          </li>
+          <li className="nav-item">
             <Link to="/vendedor" className="nav-link">PVendedor</Link>
           </li>
         </ul>

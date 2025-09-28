@@ -12,6 +12,7 @@ import Estoque from '../components/Body/Estoque';
 import Header from '../components/Headers/Header';
 import Home from '../components/Body/Home';
 import Landing from '../components/Headers/Landing';
+import IA from '../components/Body/IA';
 import VendasVendedor from '../components/Tables/VendasVendedor';
 
 const router = createBrowserRouter([
@@ -25,6 +26,7 @@ const router = createBrowserRouter([
       { path: "/financeiro", element: <PFinanceiro /> },
       { path: "/estoque", element: <PEstoque /> },
       { path: "/clientes", element: <PClientes /> },
+      { path: "/IA", element: <PIA /> },
       { path: "/login", element: <PLogin /> },
       { path: "/registrar", element: <PCadastro /> }
     ]
@@ -47,6 +49,15 @@ function PClientes() {
     <>
       <Menu />
       <Clientes />
+    </>
+  );
+}
+
+function PIA() {
+  return (
+    <>
+      <Menu />
+      <IA />
     </>
   );
 }
