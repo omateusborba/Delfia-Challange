@@ -15,7 +15,7 @@ public class GeminiChat {
     private static final String ChaveAPI = apiKey.getChaveAPI();
 
     private static final String ENDPOINT =
-            "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + ChaveAPI;
+            "https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=" + ChaveAPI;
 
     public static String perguntar(String mensagem) throws Exception {
         String resposta = enviar(mensagem);

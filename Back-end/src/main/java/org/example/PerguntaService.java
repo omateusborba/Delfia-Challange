@@ -30,16 +30,16 @@ public class PerguntaService {
                 String estoque = consultaProdutosEstoqueBaixo(conn);
 
                 prompt = """
-                         Tenho os seguintes dados:
-                         - Clientes que mais compram:
-                         %s
-                         - Produtos mais vendidos:
-                         %s
-                         - Produtos com estoque baixo:
-                         %s
-
-                         Analise os dados e sugira a melhor estratégia de negócio para este mês.
-                         """.formatted(clientes, produtos, estoque);
+                        Tenho os seguintes dados:
+                        - Clientes que mais compram:
+                        %s
+                        - Produtos mais vendidos:
+                        %s
+                        - Produtos com estoque baixo:
+                        %s
+                        
+                        Analise os dados e sugira a melhor estratégia de negócio para este mês.
+                        """.formatted(clientes, produtos, estoque);
                 break;
 
             default:
@@ -52,20 +52,20 @@ public class PerguntaService {
     private static String consultaClientesQueMaisCompram(Connection conn) throws SQLException {
         StringBuilder sb = new StringBuilder();
         String sql = """
-                SELECT nome, SUM(valor_total) AS total
-                FROM vendas v
-                JOIN clientes c ON v.cliente_id = c.id
-                GROUP BY nome
-                ORDER BY total DESC
+                SELECT c.nm_cliente, SUM(p.vl_total) AS vl_total
+                                FROM t_pedido p
+                                JOIN t_cliente c ON c.id_cliente = p.t_cliente_id_cliente
+                                GROUP BY c.nm_cliente
+                                ORDER BY vl_total DESC
                 LIMIT 5
                 """;
         try (PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 sb.append("- ")
-                        .append(rs.getString("nome"))
+                        .append(rs.getString("nm_cliente"))
                         .append(": R$ ")
-                        .append(rs.getDouble("total"))
+                        .append(rs.getDouble("vl_total"))
                         .append("\n");
             }
         }
@@ -75,20 +75,20 @@ public class PerguntaService {
     private static String consultaProdutosQueMaisVendidos(Connection conn) throws SQLException {
         StringBuilder sb = new StringBuilder();
         String sql = """
-                SELECT p.nome, SUM(iv.quantidade) AS qtd
-                FROM itens_venda iv
-                JOIN produtos p ON iv.produto_id = p.id
-                GROUP BY p.nome
-                ORDER BY qtd DESC
+                SELECT e.nm_produto, SUM(ip.qt_item) AS qt_item
+                                                 FROM t_item_pedido ip
+                                                 JOIN t_estoque e ON e.id_produto = ip.t_estoque_id_produto
+                                                 GROUP BY e.nm_produto
+                                                 ORDER BY qt_item DESC
                 LIMIT 5
                 """;
         try (PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 sb.append("- ")
-                        .append(rs.getString("nome"))
+                        .append(rs.getString("nm_produto"))
                         .append(": ")
-                        .append(rs.getInt("qtd"))
+                        .append(rs.getInt("qt_item"))
                         .append(" unidades\n");
             }
         }
@@ -97,14 +97,14 @@ public class PerguntaService {
 
     private static String consultaProdutosEstoqueBaixo(Connection conn) throws SQLException {
         StringBuilder sb = new StringBuilder();
-        String sql = "SELECT nome, quantidade FROM produtos WHERE quantidade < 10 ORDER BY quantidade ASC";
+        String sql = "SELECT nm_produto, qt_produto FROM t_estoque WHERE qt_produto < 10 ORDER BY qt_produto ASC";
         try (PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 sb.append("- ")
-                        .append(rs.getString("nome"))
+                        .append(rs.getString("nm_produto"))
                         .append(": ")
-                        .append(rs.getInt("quantidade"))
+                        .append(rs.getInt("qt_produto"))
                         .append(" em estoque\n");
             }
         }
