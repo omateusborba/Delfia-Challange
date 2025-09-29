@@ -8,24 +8,28 @@ export default function IA() {
     const [loading, setLoading] = useState(false);
 
     const perguntas = [
-        "Quais os clientes que mais compram?",
-        "Quais os produtos que mais vendem?",
-        "Quais produtos estão perto de acabar no meu estoque?",
-        "Analisando os meus dados, qual a melhor estratégia de negócio para esse mês?"
+        { label: "Quais os clientes que mais compram?", value: "clientes" },
+        { label: "Quais os produtos que mais vendem?", value: "produtos" },
+        { label: "Quais produtos estão perto de acabar no meu estoque?", value: "estoque" },
+        { label: "Analisando os meus dados, qual a melhor estratégia de negócio para esse mês?", value: "estrategia" }
     ];
 
-    const handlePergunta = async (pergunta) => {
-        setMessages((prev) => [...prev, { sender: "user", text: pergunta }]);
+    const handlePergunta = async ({ label, value }) => {
+        setMessages((prev) => [...prev, { sender: "user", text: label }]);
         setLoading(true);
 
         try {
-            const res = await axios.post("http://localhost:8080/perguntas", {
-                pergunta: pergunta
+            const res = await axios.post("http://localhost:8081/ia", {
+                pergunta: value
             });
-            setMessages((prev) => [
-                ...prev,
-                { sender: "bot", text: res.data.resposta }
-            ]);
+            if (res.status === 200 && res.data?.resposta) {
+                setMessages((prev) => [
+                    ...prev,
+                    { sender: "bot", text: res.data.resposta }
+                ]);
+            } else {
+                throw new Error("Resposta inesperada do servidor");
+            }
         } catch (err) {
             console.error(err);
             setMessages((prev) => [
@@ -64,26 +68,28 @@ export default function IA() {
                                     >
                                         <span
                                             className={`p-2 rounded ${msg.sender === "user"
-                                                    ? "bg-primary text-white"
-                                                    : "bg-light border"
+                                                ? "bg-primary text-white"
+                                                : "bg-light border"
                                                 }`}
                                         >
                                             {msg.text}
                                         </span>
                                     </div>
                                 ))}
-                                {loading && <div className="text-muted">⏳ Pensando...</div>}
+                                {loading && <div class="spinner-grow text-primary spinner-grow-sm" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>}
                             </div>
 
                             {/* Botões de perguntas pré-definidas */}
                             <div className="d-flex flex-wrap gap-2">
-                                {perguntas.map((p, idx) => (
+                                {perguntas.map((pergunta, idx) => (
                                     <button
                                         key={idx}
-                                        className="btn btn-outline-info btn-sm"
-                                        onClick={() => handlePergunta(p)}
+                                        className="btn btn-outline-primary btn-sm"
+                                        onClick={() => handlePergunta(pergunta)}
                                     >
-                                        {p}
+                                        {pergunta.label}
                                     </button>
                                 ))}
                             </div>
